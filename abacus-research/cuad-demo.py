@@ -10,6 +10,12 @@ from cuad_data_loader import load_cuad_data
 import palimpzest as pz
 from palimpzest.constants import Model
 
+import litellm
+os.environ["SUPPRESS_LITELLM_LOGS"] = "True"
+litellm.suppress_handler_warnings = True
+litellm.suppress_debug_info = True
+# litellm._turn_on_debug()
+
 CUAD_CATEGORIES = [
     {
         "Category": "Document Name",
@@ -659,6 +665,12 @@ def parse_arguments():
         type=str,
         help="One of 'mincost', 'mintime', 'maxquality'",
     )
+    parser.add_argument(
+        "--num-contracts",
+        default=100,
+        type=int,
+        help="Number of contracts to evaluate",
+    )
     return parser.parse_args()
 
 
@@ -698,11 +710,12 @@ def main():
     os.makedirs("opt-profiling-data", exist_ok=True)
 
     # create validator for CUAD
-    validator = CUADValidator(num_contracts=25, seed=args.seed)
+    validator_size = min(25, args.num_contracts)
+    validator = CUADValidator(num_contracts=validator_size, seed=args.seed)
 
     # create datasets for CUAD
-    dataset = CUADDataset(split="test", num_contracts=100, seed=args.seed)
-    train_dataset = CUADDataset(split="train", num_contracts=25, seed=args.seed)
+    dataset = CUADDataset(split="test", num_contracts=args.num_contracts, seed=args.seed)
+    train_dataset = CUADDataset(split="train", num_contracts=validator_size, seed=args.seed)
     train_dataset = {train_dataset.id: train_dataset}
     print("Created datasets")
 
@@ -723,14 +736,18 @@ def main():
     print(f"USING POLICY: {policy}")
 
     # set models
-    models = [Model.GPT_4o_MINI] if args.gpt4_mini_only else [
-        Model.GPT_4o,
-        Model.GPT_4o_MINI,
-        Model.LLAMA3_1_8B,
-        Model.LLAMA3_3_70B,
-        # Model.MIXTRAL, # NOTE: only available in tag `abacus-paper-experiments`
-        Model.DEEPSEEK_R1_DISTILL_QWEN_1_5B,
-    ]
+    # models = [Model.GPT_4o_MINI] if args.gpt4_mini_only else [
+    #     Model.GPT_4o,
+    #     Model.GPT_4o_MINI,
+    #     Model.LLAMA3_1_8B,
+    #     Model.LLAMA3_3_70B,
+    #     # Model.MIXTRAL, # NOTE: only available in tag `abacus-paper-experiments`
+    #     Model.DEEPSEEK_R1_DISTILL_QWEN_1_5B,
+    # ]
+    qwen_14b_gpu0 = pz.Model("Qwen2.5-14B-GPU0", api_base="http://localhost:8005/v1")                           
+    qwen_14b_gpu1 = pz.Model("Qwen2.5-14B-GPU1", api_base="http://localhost:8006/v1")                           
+                                                                                                                
+    models = [qwen_14b_gpu0, qwen_14b_gpu1]                                    
 
     sentinel_strategy = args.sentinel_execution_strategy
     optimizer_strategy = args.optimizer_strategy
@@ -781,7 +798,7 @@ def main():
         json.dump(execution_stats_dict, f)
 
     pred_df = data_record_collection.to_df()
-    label_df = get_label_df(num_contracts=100, seed=seed)
+    label_df = get_label_df(num_contracts=args.num_contracts, seed=seed)
     # pred_df.to_csv(f"{exp_name}-pred.csv", index=False)
     # label_df.to_csv(f"{exp_name}-label.csv", index=False)
     final_plan_id = list(data_record_collection.execution_stats.plan_stats.keys())[0]

@@ -53,6 +53,7 @@ class QueryProcessorConfig(BaseModel):
     exp_name: str | None = Field(default=None)
     priors: dict | None = Field(default=None)
     dont_use_priors: bool = Field(default=False)
+    sample_timeout: float | None = Field(default=None)
 
     def to_dict(self) -> dict:
         """Convert the config to a dict representation."""

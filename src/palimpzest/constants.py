@@ -219,6 +219,7 @@ class Model:
 
         # Start with defaults, then overlay predicted values
         specs = {
+            "provider": "hosted_vllm",
             "is_text_model": True,
             "is_vision_model": False,
             "is_llama_model": False,

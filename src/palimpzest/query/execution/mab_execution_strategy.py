@@ -528,6 +528,10 @@ class OpFrontier:
                 new_frontier_full_op_ids.add(full_op_id)
                 continue
 
+            # if this operator timed out / failed (mean quality 0.0), do not keep it on the frontier via UCB optimism
+            if metrics["mean"][2] == 0.0:
+                continue
+
             # otherwise, if this op overlaps with an op on the pareto frontier, keep it in our frontier ops
             # NOTE: for now, we perform an optimistic comparison with the ucb/lcb
             pareto_frontier = True
@@ -701,7 +705,12 @@ class MABExecutionStrategy(SentinelExecutionStrategy):
         ) -> SentinelPlanStats:
         # sample records and operators and update the frontiers
         samples_drawn, sampling_cost = 0, 0.0
+        round_num = 1
+        import datetime
         while not self._compute_termination_condition(samples_drawn, sampling_cost):
+            ts = datetime.datetime.now().strftime("[%H:%M:%S]")
+            print(f"\n{ts} ==================== SENTINEL ROUND {round_num} (Total Samples Drawn: {samples_drawn}/{self.sample_budget}) ====================\n", flush=True)
+            round_num += 1
             # pre-compute the set of source indices which will need to be sampled
             source_indices_to_sample = set()
             for op_frontier in op_frontiers.values():
@@ -734,7 +743,13 @@ class MABExecutionStrategy(SentinelExecutionStrategy):
                     continue
 
                 # run sampled operators on sampled inputs and update the number of samples drawn
-                source_indices_to_record_set_tuples, num_llm_ops = self._execute_op_set(unique_logical_op_id, frontier_op_inputs)
+                source_indices_to_record_set_tuples, num_llm_ops = self._execute_op_set(
+                    unique_logical_op_id,
+                    frontier_op_inputs,
+                    validator,
+                    op_frontiers[unique_logical_op_id],
+                    plan_stats,
+                )
                 samples_drawn += num_llm_ops
 
                 # score the quality of each generated output
@@ -742,6 +757,8 @@ class MABExecutionStrategy(SentinelExecutionStrategy):
                     source_indices: [(record_set, op) for record_set, op, _ in record_set_tuples]
                     for source_indices, record_set_tuples in source_indices_to_record_set_tuples.items()
                 }
+                ts = datetime.datetime.now().strftime("[%H:%M:%S]")
+                print(f"{ts} [Sentinel Validation] Scoring quality for surviving records of {unique_logical_op_id}...", flush=True)
                 source_indices_to_all_record_sets, val_gen_stats = self._score_quality(validator, source_indices_to_all_record_sets)
 
                 # update the progress manager with validation cost

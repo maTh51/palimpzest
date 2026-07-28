@@ -23,6 +23,9 @@ from palimpzest.core.models import GenerationStats
 from palimpzest.prompts import PromptFactory, PromptManager
 from palimpzest.utils.model_helpers import resolve_reasoning_effort
 
+os.environ["SUPPRESS_LITELLM_LOGS"] = "True"
+litellm.suppress_handler_warnings = True
+
 # DEFINITIONS
 GenerationOutput = tuple[dict, str | None, GenerationStats, list[dict]]
 ContextType = TypeVar("ContextType")
@@ -319,8 +322,14 @@ class Generator(Generic[ContextType, InputType]):
         messages = self.prompt_factory.create_messages(candidate, fields, right_candidate, **kwargs)
         is_audio_op = any(msg.get("type") == "input_audio" for msg in messages)
 
-        if "cache_isolation_id" in kwargs:
-            messages = self.prompt_manager.inject_cache_isolation_id(messages, kwargs["cache_isolation_id"])
+        import os
+        import uuid
+        cache_isolation_id = kwargs.get("cache_isolation_id")
+        if cache_isolation_id is None and os.getenv("DISABLE_CACHE"):
+            cache_isolation_id = str(uuid.uuid4().hex[:8])
+
+        if cache_isolation_id is not None:
+            messages = self.prompt_manager.inject_cache_isolation_id(messages, cache_isolation_id)
 
         # generate the text completion
         start_time = time.time()
@@ -347,6 +356,14 @@ class Generator(Generic[ContextType, InputType]):
             else:
                 # Use litellm for all other providers
                 completion_kwargs = {}
+                timeout = getattr(self, "timeout", None)
+                if timeout is None and os.getenv("SAMPLE_TIMEOUT"):
+                    try:
+                        timeout = float(os.getenv("SAMPLE_TIMEOUT"))
+                    except ValueError:
+                        timeout = None
+                if timeout is not None:
+                    completion_kwargs["timeout"] = timeout
                 if not self.model.is_o_model() and not self.model.is_gpt_5_model():
                     completion_kwargs = {"temperature": kwargs.get("temperature", 0.0), **completion_kwargs}
                 if is_audio_op:
@@ -355,11 +372,14 @@ class Generator(Generic[ContextType, InputType]):
                     reasoning_effort = resolve_reasoning_effort(self.model, self.reasoning_effort)
                     completion_kwargs = {"reasoning_effort": reasoning_effort, **completion_kwargs}
                 if self.model.is_vllm_model():
-                    completion_kwargs = {"api_base": self.model.api_base, "api_key": os.environ.get("VLLM_API_KEY", "fake-api-key"), **self.model.vllm_kwargs, **completion_kwargs}
+                    completion_kwargs = {"api_base": self.model.api_base, "api_key": os.environ.get("VLLM_API_KEY", "fake-api-key"), "custom_provider": "openai", **self.model.vllm_kwargs, **completion_kwargs}
+                model_name = self.model_name
+                if self.model.is_vllm_model() and not model_name.startswith("openai/"):
+                    model_name = f"openai/{model_name}"
 
                 cache_kwargs = self.prompt_manager.get_cache_kwargs()
                 completion_kwargs = {**completion_kwargs, **cache_kwargs}
-                completion = litellm.completion(model=self.model_name, messages=messages, **completion_kwargs)
+                completion = litellm.completion(model=model_name, messages=messages, **completion_kwargs)
                 end_time = time.time()
                 completion_text = completion.choices[0].message.content
                 usage = completion.usage.model_dump()
