@@ -91,15 +91,25 @@ stop_vllm() {
 # Trap script exit/error/SIGINT/SIGTERM to guarantee cleanup
 trap 'stop_vllm' EXIT INT TERM
 
-# ---- Main loop --------------------------------------------------------------
+# Set USE_ADAPTIVE=1 to run Strategy 1 Operator Self-Adaptive Timeout
+USE_ADAPTIVE=${USE_ADAPTIVE:-1}
+
 for TIMEOUT in "${TIMEOUTS[@]}"; do
     export DISABLE_MID_EXECUTION_PRUNING=1
     export DISABLE_CACHE=1
 
-    if [ "$TIMEOUT" -eq 0 ]; then
+    if [ "$USE_ADAPTIVE" -eq 1 ]; then
+        export ADAPTIVE_TIMEOUT=1
+        export TIMEOUT_MULTIPLIER=${TIMEOUT_MULTIPLIER:-1.5}
+        export TIMEOUT_MARGIN=${TIMEOUT_MARGIN:-10.0}
+        export SAFETY_TIMEOUT=${SAFETY_TIMEOUT:-180.0}
+        EXP_NAME="adaptive-timeout-${TIMEOUT_MULTIPLIER}x-${TIMEOUT_MARGIN}s"
+    elif [ "$TIMEOUT" -eq 0 ]; then
+        unset ADAPTIVE_TIMEOUT
         EXP_NAME="timeout-baseline-no-timeout"
         unset SAMPLE_TIMEOUT
     else
+        unset ADAPTIVE_TIMEOUT
         EXP_NAME="timeout-pruning-${TIMEOUT}s"
         export SAMPLE_TIMEOUT="${TIMEOUT}"
     fi

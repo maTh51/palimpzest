@@ -307,13 +307,50 @@ class SentinelExecutionStrategy(BaseExecutionStrategy, ABC):
             rs.input = input_data
             return rs
 
-        # resolve timeout: attribute takes priority, then env var
+        # resolve static timeout: attribute takes priority, then env var
         time_limit = getattr(self, "sample_timeout", None)
         if time_limit is None and os.getenv("SAMPLE_TIMEOUT"):
             try:
                 time_limit = float(os.getenv("SAMPLE_TIMEOUT"))
             except ValueError:
                 pass
+
+        # Adaptive timeout resolution
+        use_adaptive_timeout = os.getenv("ADAPTIVE_TIMEOUT") == "1"
+        adaptive_multiplier = float(os.getenv("TIMEOUT_MULTIPLIER", "1.5"))
+        adaptive_margin = float(os.getenv("TIMEOUT_MARGIN", "10.0"))
+        safety_timeout = float(os.getenv("SAFETY_TIMEOUT", "180.0"))
+        min_timeout = float(os.getenv("MIN_TIMEOUT", "5.0"))
+
+        def resolve_op_timeout(operator):
+            if not use_adaptive_timeout:
+                return time_limit
+
+            op_id = operator.get_full_op_id()
+            completed_times = []
+
+            # Check historical samples in plan_stats
+            if plan_stats is not None:
+                op_stats = plan_stats.operator_stats.get(unique_logical_op_id, {}).get(op_id)
+                if op_stats is not None:
+                    completed_times.extend([
+                        r.time_per_record for r in op_stats.record_op_stats_lst
+                        if getattr(r, "passed_operator", False) and getattr(r, "time_per_record", 0.0) > 0.0
+                    ])
+
+            # Check samples completed so far in current batch output_record_sets
+            for rec_set, op, src_idx, _ in output_record_sets:
+                if op.get_full_op_id() == op_id:
+                    completed_times.extend([
+                        r.time_per_record for r in rec_set.record_op_stats
+                        if getattr(r, "passed_operator", False) and getattr(r, "time_per_record", 0.0) > 0.0
+                    ])
+
+            if completed_times:
+                mean_t = sum(completed_times) / len(completed_times)
+                return max(min_timeout, mean_t * adaptive_multiplier + adaptive_margin)
+
+            return time_limit if time_limit is not None else safety_timeout
 
         # initialize mapping from source indices to output record sets
         source_indices_to_record_sets_and_ops = {source_indices: [] for _, source_indices, _ in op_inputs}
@@ -388,24 +425,24 @@ class SentinelExecutionStrategy(BaseExecutionStrategy, ABC):
                             print(f"\n[Sentinel Exception] Operator {op_id} failed: {e}.\n", flush=True)
 
                     # wall-clock timeout check
-                    if time_limit is not None:
-                        now = time.time()
-                        for future in list(remaining):
-                            elapsed = now - future_to_start_time[future]
-                            if elapsed > time_limit:
-                                timeout_count += 1
-                                future.cancel()
-                                remaining.discard(future)
-                                operator, source_indices, input_data = future_to_info[future]
-                                op_id = operator.get_full_op_id()
-                                ts2 = datetime.datetime.now().strftime("[%H:%M:%S]")
-                                print(f"{ts2} [Sentinel Timeout] Operator {op_id} timed out (> {time_limit:.2f}s). Cancelling.", flush=True)
-                                record_set = make_failed_record_set(operator, source_indices, input_data, time_limit, "timeout-failed")
-                                if self._is_llm_op(operator):
-                                    num_llm_ops += 1
-                                    if self.progress_manager is not None:
-                                        self.progress_manager.incr(unique_logical_op_id, num_samples=1, total_cost=0.0)
-                                output_record_sets.append((record_set, operator, source_indices, input_data))
+                    now = time.time()
+                    for future in list(remaining):
+                        elapsed = now - future_to_start_time[future]
+                        operator, source_indices, input_data = future_to_info[future]
+                        current_limit = resolve_op_timeout(operator)
+                        if current_limit is not None and elapsed > current_limit:
+                            timeout_count += 1
+                            future.cancel()
+                            remaining.discard(future)
+                            op_id = operator.get_full_op_id()
+                            ts2 = datetime.datetime.now().strftime("[%H:%M:%S]")
+                            print(f"{ts2} [Sentinel Timeout] Operator {op_id} timed out (> {current_limit:.2f}s). Cancelling.", flush=True)
+                            record_set = make_failed_record_set(operator, source_indices, input_data, current_limit, "timeout-failed")
+                            if self._is_llm_op(operator):
+                                num_llm_ops += 1
+                                if self.progress_manager is not None:
+                                    self.progress_manager.incr(unique_logical_op_id, num_samples=1, total_cost=0.0)
+                            output_record_sets.append((record_set, operator, source_indices, input_data))
 
             # ------------------------------------------------------------------
             # FULL PATH: mid-execution speculative Pareto pruning + timeout.
@@ -476,27 +513,27 @@ class SentinelExecutionStrategy(BaseExecutionStrategy, ABC):
                         stats["completed_records"].append((record_set, operator, source_indices, input_data))
 
                     # Timeout check
-                    if time_limit is not None:
-                        now = time.time()
-                        for future in list(active_futures):
-                            elapsed = now - future_to_start_time[future]
-                            if elapsed > time_limit:
-                                timeout_count += 1
-                                future.cancel()
-                                active_futures.remove(future)
-                                operator, source_indices, input_data = future_to_info[future]
-                                op_id = operator.get_full_op_id()
-                                ts2 = datetime.datetime.now().strftime("[%H:%M:%S]")
-                                print(f"{ts2} [Sentinel Timeout] Operator {op_id} timed out (> {time_limit:.2f}s). Cancelling.", flush=True)
-                                stats = op_id_to_stats[op_id]
-                                record_set = make_failed_record_set(operator, source_indices, input_data, time_limit, "timeout-failed")
-                                stats["quality_scores"].append(0.0)
-                                stats["total_time"] += time_limit
-                                stats["completed_records"].append((record_set, operator, source_indices, input_data))
-                                if self._is_llm_op(operator):
-                                    num_llm_ops += 1
-                                    if self.progress_manager is not None:
-                                        self.progress_manager.incr(unique_logical_op_id, num_samples=1, total_cost=0.0)
+                    now = time.time()
+                    for future in list(active_futures):
+                        elapsed = now - future_to_start_time[future]
+                        operator, source_indices, input_data = future_to_info[future]
+                        current_limit = resolve_op_timeout(operator)
+                        if current_limit is not None and elapsed > current_limit:
+                            timeout_count += 1
+                            future.cancel()
+                            active_futures.remove(future)
+                            op_id = operator.get_full_op_id()
+                            ts2 = datetime.datetime.now().strftime("[%H:%M:%S]")
+                            print(f"{ts2} [Sentinel Timeout] Operator {op_id} timed out (> {current_limit:.2f}s). Cancelling.", flush=True)
+                            stats = op_id_to_stats[op_id]
+                            record_set = make_failed_record_set(operator, source_indices, input_data, current_limit, "timeout-failed")
+                            stats["quality_scores"].append(0.0)
+                            stats["total_time"] += current_limit
+                            stats["completed_records"].append((record_set, operator, source_indices, input_data))
+                            if self._is_llm_op(operator):
+                                num_llm_ops += 1
+                                if self.progress_manager is not None:
+                                    self.progress_manager.incr(unique_logical_op_id, num_samples=1, total_cost=0.0)
 
                     # Mid-execution Pareto dominance pruning
                     if op_frontier is not None and plan_stats is not None:
