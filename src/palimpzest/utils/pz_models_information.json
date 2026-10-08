@@ -884,5 +884,20 @@
         "provider": "ollama",
         "sources": [],
         "note": "copied text-embedding-3-small model card and made numbers slightly worse to protect default behavior for max quality and min latency"
+    },
+    "nomic-ai/nomic-embed-text-v1": {
+        "usd_per_input_token": 0.0,
+        "usd_per_output_token": null,
+        "seconds_per_output_token": 0.01,
+        "MMLU_Pro_score": 50.0,
+        "is_reasoning_model": false,
+        "is_text_model": false,
+        "is_vision_model": false,
+        "is_audio_model": false,
+        "is_embedding_model": true,
+        "is_text_image_multimodal_embedding_model": false,
+        "provider": "vllm-local",
+        "sources": ["https://huggingface.co/nomic-ai/nomic-embed-text-v1"],
+        "note": "local vLLM embedding server; zero cost, equivalent performance to ollama/nomic-embed-text"
     }
 }

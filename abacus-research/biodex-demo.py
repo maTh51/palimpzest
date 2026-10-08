@@ -2,6 +2,7 @@ import argparse
 import json
 import os
 import time
+import numpy as np
 
 import chromadb
 import datasets
@@ -9,6 +10,42 @@ from chromadb.utils.embedding_functions.openai_embedding_function import OpenAIE
 
 import palimpzest as pz
 from palimpzest.constants import Model
+import httpx
+import litellm
+os.environ["SUPPRESS_LITELLM_LOGS"] = "True"
+os.environ["LITELLM_REQUEST_TIMEOUT"] = "120"
+litellm.suppress_handler_warnings = True
+litellm.suppress_debug_info = True
+litellm.request_timeout = 120.0
+
+# Patch Model registry and TopK to recognize nomic-ai/nomic-embed-text-v1 in any Palimpzest container
+try:
+    class _NomicEmbeddingModel:
+        value = "nomic-ai/nomic-embed-text-v1"
+        name = "NOMIC_EMBED_TEXT_V1"
+        def is_embedding_model(self):
+            return True
+
+    if hasattr(Model, 'get_all_models'):
+        _orig_get_all = Model.get_all_models
+        Model.get_all_models = classmethod(lambda cls: list(_orig_get_all()) + [_NomicEmbeddingModel()])
+
+    import palimpzest.query.operators.topk as _topk_mod
+    _orig_topk_call = _topk_mod.TopK.__call__
+    def _safe_topk_call(self, *args, **kwargs):
+        try:
+            return _orig_topk_call(self, *args, **kwargs)
+        except AssertionError as e:
+            if "For Chromadb, we currently only support" in str(e):
+                import palimpzest.constants as _c
+                if hasattr(_c.Model, 'get_all_models'):
+                    _c.Model.get_all_models = classmethod(lambda cls: [_NomicEmbeddingModel(), _NomicEmbeddingModel()])
+                return _orig_topk_call(self, *args, **kwargs)
+            raise e
+    _topk_mod.TopK.__call__ = _safe_topk_call
+    print("[INFO] Successfully patched Palimpzest Model & TopK for ChromaDB embedding support.")
+except Exception as _patch_err:
+    print(f"[WARN] Could not patch TopK registry: {_patch_err}")
 
 biodex_entry_cols = [
     {"name": "pmid", "type": str, "desc": "The PubMed ID of the medical paper"},
@@ -259,12 +296,34 @@ if __name__ == "__main__":
         help="A file with a dictionary mapping physical operator ids to prior belief on their performance",
     )
     parser.add_argument(
+        "--priors-mode",
+        default="with_belief",
+        type=str,
+        choices=["with_belief", "without_belief", "random_belief", "default", "none", "random", "reversed"],
+        help="Belief strategy: 'with_belief' (use true priors), 'without_belief' (no priors/cold-start), 'random_belief' (randomized priors), 'reversed' (adversarial worst-first)",
+    )
+    parser.add_argument(
         "--quality",
         default=None,
         type=float,
         help="Quality threshold",
     )
-
+    parser.add_argument(
+        "--time-budget",
+        default=None,
+        type=float,
+        help="Time budget in seconds (used with --policy maxqualityatfixedtime)",
+    )
+    parser.add_argument(
+        "--model1-port",
+        default="8005",
+        help="Port for model 1 / GPU 0",
+    )
+    parser.add_argument(
+        "--model2-port",
+        default="8006",
+        help="Port for model 2 / GPU 1",
+    )
     args = parser.parse_args()
 
     # create directory for profiling data
@@ -285,9 +344,36 @@ if __name__ == "__main__":
         else args.exp_name
     )
     priors = None
-    if args.priors_file is not None:
+    if args.priors_mode in ["without_belief", "none"]:
+        priors = None
+        print("[INFO] Running WITHOUT BELIEF / PRIORS (Unbiased Cold Start exploration).")
+    elif args.priors_file is not None:
         with open(args.priors_file) as f:
             priors = json.load(f)
+            
+        if args.priors_mode in ["random_belief", "random"]:
+            # Randomize beliefs: shuffle prior values across operator keys
+            keys = list(priors.keys())
+            vals = list(priors.values())
+            np.random.seed(seed)
+            np.random.shuffle(vals)
+            priors = {k: v for k, v in zip(keys, vals)}
+            print("[INFO] Applied RANDOM beliefs/priors across all operators.")
+        elif args.priors_mode == "reversed":
+            # Invert beliefs: make low quality look high and high cost look low
+            max_c = max(v.get("cost", 0.0) for v in priors.values()) or 1.0
+            max_t = max(v.get("time", 0.0) for v in priors.values()) or 1.0
+            reversed_priors = {}
+            for k, v in priors.items():
+                reversed_priors[k] = {
+                    "quality": max(0.0, 1.0 - float(v.get("quality", 0.0))),
+                    "cost": max(0.001, max_c - float(v.get("cost", 0.0))),
+                    "time": max(0.1, max_t - float(v.get("time", 0.0)))
+                }
+            priors = reversed_priors
+            print("[INFO] Applied REVERSED (adversarial/worst-first) beliefs across all operators.")
+        else:
+            print("[INFO] Running WITH BELIEF (Standard offline profiling priors).")
 
     # set the optimization policy; constraint set to 25% percentile from unconstrained plans
     policy = pz.MaxQuality() if not args.constrained else pz.MaxQualityAtFixedCost(max_cost=2.250)
@@ -299,6 +385,8 @@ if __name__ == "__main__":
         policy = pz.MinCostAtFixedQuality(min_quality=args.quality)
     elif args.quality is not None and args.policy == "minlatencyatfixedquality":
         policy = pz.MinTimeAtFixedQuality(min_quality=args.quality)
+    elif args.time_budget is not None and args.policy == "maxqualityatfixedtime":
+        policy = pz.MaxQualityAtFixedTime(max_time=args.time_budget)
     print(f"USING POLICY: {policy}")
 
     if os.getenv("OPENAI_API_KEY") is None and os.getenv("TOGETHER_API_KEY") is None and os.getenv("ANTHROPIC_API_KEY") is None:
@@ -323,11 +411,18 @@ if __name__ == "__main__":
 
     # load index [text-embedding-3-small]
     chroma_client = chromadb.PersistentClient(".chroma-biodex")
+    # openai_ef = OpenAIEmbeddingFunction(
+    #     api_key=os.environ["OPENAI_API_KEY"],
+    #     model_name="text-embedding-3-small",
+    # )
     openai_ef = OpenAIEmbeddingFunction(
-        api_key=os.environ["OPENAI_API_KEY"],
-        model_name="text-embedding-3-small",
+        api_key="EMPTY",
+        model_name="nomic-ai/nomic-embed-text-v1",
+        # http_client = httpx.Client(base_url="http://localhost:8001/v1/embeddings"),
     )
-    index = chroma_client.get_collection("biodex-reaction-terms", embedding_function=openai_ef)
+    
+    # index = chroma_client.get_collection("biodex-reaction-terms", embedding_function=openai_ef)
+    index = chroma_client.get_or_create_collection("biodex-reaction-terms", embedding_function=openai_ef)
 
     def search_func(index: chromadb.Collection, query: list[list[float]], k: int) -> list[str]:
         # execute query with embeddings
@@ -366,14 +461,10 @@ if __name__ == "__main__":
     plan = plan.sem_map(biodex_ranked_reactions_labels_cols, depends_on=["title", "abstract", "fulltext", "reaction_labels"])
 
     # set models
-    models = [Model.GPT_4o_MINI] if args.gpt4_mini_only else [
-        Model.GPT_4o,
-        Model.GPT_4o_MINI,
-        Model.LLAMA3_1_8B,
-        Model.LLAMA3_3_70B,
-        # Model.MIXTRAL,  # NOTE: only available in tag `abacus-paper-experiments`
-        Model.DEEPSEEK_R1_DISTILL_QWEN_1_5B,
-    ]
+    qwen_14b_gpu0 = pz.Model("Qwen2.5-14B-GPU0", api_base=f"http://localhost:{args.model1_port}/v1")                           
+    qwen_14b_gpu1 = pz.Model("Qwen2.5-14B-GPU1", api_base=f"http://localhost:{args.model2_port}/v1")                           
+                                                                                                                    
+    models = [qwen_14b_gpu0, qwen_14b_gpu1] 
 
     # execute pz plan
     config = pz.QueryProcessorConfig(
@@ -382,7 +473,7 @@ if __name__ == "__main__":
         sentinel_execution_strategy=sentinel_execution_strategy,
         execution_strategy=execution_strategy,
         use_final_op_quality=True,
-        max_workers=64,
+        max_workers=16,
         verbose=verbose,
         available_models=models,
         allow_bonded_query=True,

@@ -239,15 +239,37 @@ class TopKOp(PhysicalOperator):
             assert uses_openai_embedding_fcn or uses_clip_model, error_msg
 
             model_name = self.index._embedding_function.model_name if uses_openai_embedding_fcn else "clip-ViT-B-32"
-            err_msg = f"For Chromadb, we currently only support `text-embedding-3-small` and `clip-ViT-B-32`; your index uses: {model_name}"
-            embedding_model_names = [model.value for model in Model.get_all_models() if model.is_embedding_model()]
-            assert model_name in embedding_model_names, err_msg
+
+            # detect local vLLM embedding models (e.g. nomic-ai/nomic-embed-text-v1)
+            # these bypass the palimpzest model registry check since they aren't registered remotely
+            _openai_model_prefixes = ("text-embedding-", "clip-")
+            uses_vllm_embedding = uses_openai_embedding_fcn and not any(
+                model_name.startswith(p) for p in _openai_model_prefixes
+            )
+
+            # only validate against the registry for known OpenAI/CLIP models
+            if not uses_vllm_embedding:
+                embedding_model_names = [model.value for model in Model.get_all_models() if model.is_embedding_model()]
+                err_msg = f"For Chromadb, we currently only support {embedding_model_names}; your index uses: {model_name}"
+                assert model_name in embedding_model_names, err_msg
+
 
             # compute embeddings
             try:
                 embed_start_time = time.time()
                 total_input_tokens = 0.0
-                if uses_openai_embedding_fcn:
+                if uses_vllm_embedding:
+                    # Route to local vLLM embedding server (OpenAI-compatible API)
+                    import os as _os
+                    from openai import OpenAI as _OpenAI
+                    _embedding_port = _os.environ.get("EMBEDDING_PORT", "8010")
+                    _base_url = f"http://localhost:{_embedding_port}/v1"
+                    client = _OpenAI(api_key="EMPTY", base_url=_base_url)
+                    response = client.embeddings.create(input=query, model=model_name)
+                    total_input_tokens = response.usage.total_tokens
+                    inputs = [item.embedding for item in response.data]
+
+                elif uses_openai_embedding_fcn:
                     client = OpenAI()
                     response = client.embeddings.create(input=query, model=model_name)
                     total_input_tokens = response.usage.total_tokens

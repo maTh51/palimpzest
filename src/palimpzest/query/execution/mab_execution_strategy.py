@@ -1,7 +1,10 @@
+import numpy as np
+import json
+import os
 
 import logging
 
-import numpy as np
+ 
 from chromadb.api.models.Collection import Collection
 
 from palimpzest.core.data.dataset import Dataset
@@ -580,6 +583,93 @@ class OpFrontier:
 
         # update the frontier and off frontier ops
         self.frontier_ops = new_frontier_ops
+
+                        # ===== COMPREHENSIVE TRAJECTORY LOGGING =====
+        try:
+            def make_serializable(obj):
+                if isinstance(obj, np.ndarray): return obj.tolist()
+                elif isinstance(obj, np.generic): return obj.item()
+                elif isinstance(obj, set): return list(obj)
+                elif isinstance(obj, tuple): return list(obj)
+                return obj
+
+            def format_metrics(arr):
+                return {
+                    "cost": make_serializable(arr[0]),
+                    "time": make_serializable(arr[1]),
+                    "quality": make_serializable(arr[2]),
+                    "selectivity": make_serializable(arr[3])
+                }
+
+            # Map operator IDs to human readable info
+            op_info = {}
+            for op in (self.frontier_ops + self.reservoir_ops + self.off_frontier_ops):
+                fid = op.get_full_op_id()
+                info = {
+                    "operator_class": op.__class__.__name__,
+                    "logical_op_id": op.logical_op_id,
+                }
+                if hasattr(op, "model"):
+                    info["model"] = op.model.model_name
+                if hasattr(op, "prompt_strategy"):
+                    info["prompt_strategy"] = str(op.prompt_strategy)
+                if hasattr(op, "k"):
+                    info["k_limit"] = op.k
+                op_info[fid] = info
+
+            detailed_ops = {}
+            for full_op_id, metrics in op_metrics.items():
+                status = "EXPLORING"
+                if full_op_id in pareto_op_set:
+                    status = "PARETO_OPTIMAL"
+                elif full_op_id in new_frontier_full_op_ids:
+                    status = "ACTIVE_FRONTIER"
+                else:
+                    status = "RETIRED_OR_PRUNED"
+                    
+                # Determine specific pruning reason if possible
+                time_bound = policy_dict.get("time_bound")
+                mean_time = metrics["mean"][1]
+                prune_reason = None
+                if status == "RETIRED_OR_PRUNED":
+                    if time_bound is not None and mean_time > time_bound:
+                        status = "PRUNED"
+                        prune_reason = "EXCEEDED_TIMEOUT"
+                    else:
+                        status = "RETIRED"
+                        prune_reason = "DOMINATED_BY_PARETO"
+                        
+                # Extract the exact records (source indices) processed by this operator
+                records_processed = []
+                if full_op_id in self.full_op_id_to_sources_processed:
+                    records_processed = ["".join(x) if isinstance(x, tuple) else x for x in self.full_op_id_to_sources_processed[full_op_id]]
+
+                detailed_ops[full_op_id] = {
+                    "metadata": op_info.get(full_op_id, {}),
+                    "status": status,
+                    "prune_reason": prune_reason,
+                    "samples_drawn": int(full_op_id_to_num_samples.get(full_op_id, 0)),
+                    "records_processed_ids": records_processed,
+                    "metrics": {
+                        "mean": format_metrics(metrics["mean"]),
+                        "lcb": format_metrics(metrics["lcb"]),
+                        "ucb": format_metrics(metrics["ucb"])
+                    }
+                }
+
+            traj_file = os.environ.get("MAB_TRAJECTORY_LOG", "mab_trajectory.jsonl")
+            
+            round_data = {
+                "logical_op_id": unique_logical_op_id,
+                "global_total_samples": int(total_num_samples),
+                "physical_operators": detailed_ops
+            }
+            with open(traj_file, "a") as f:
+                import json
+                f.write(json.dumps(round_data) + "\n")
+        except Exception as e:
+            print(f"Error logging COMPREHENSIVE trajectory: {e}")
+        # ==================================
         self.off_frontier_ops = new_off_frontier_ops
 
     def pick_highest_quality_output(self, record_sets: list[DataRecordSet]) -> DataRecordSet:

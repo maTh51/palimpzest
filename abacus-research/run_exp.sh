@@ -18,16 +18,17 @@ set -e
 TIMEOUTS=(0 30 60 120)
 
 # ---- vLLM settings (mirrored from vllm2.sh) --------------------------------
-export HF_HOME="/mnt/scratch/global/huggingface_cache/huggingface"
+export HF_HOME="${HF_HOME:-/root/.cache/huggingface}"
 export VLLM_ALLOW_LONG_MAX_MODEL_LEN=1
 
 EMBEDDING_PORT=8010
 MODEL1_NAME="Qwen/Qwen2.5-14B-Instruct-AWQ"
-MODEL1_PORT=8006
+MODEL1_PORT=${MODEL1_PORT:-8005}
 MODEL2_NAME="Qwen/Qwen2.5-14B-Instruct-AWQ"
-MODEL2_PORT=8005
+MODEL2_PORT=${MODEL2_PORT:-8006}
 
-LOG_DIR="/mnt/scratch/matheuspimenta/palimpzest/abacus-research/var/logs"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+LOG_DIR="${LOG_DIR:-$SCRIPT_DIR/../log}"
 mkdir -p "$LOG_DIR"
 
 # ---- Helpers ----------------------------------------------------------------
@@ -42,50 +43,31 @@ wait_for_ready() {
 
 start_vllm() {
     echo ""
-    echo "[vLLM] Starting embedding server (port $EMBEDDING_PORT)..."
-    CUDA_VISIBLE_DEVICES=1 python -m vllm.entrypoints.openai.api_server \
-        --model nomic-ai/nomic-embed-text-v1 \
-        --port $EMBEDDING_PORT \
-        --trust-remote-code \
-        --max-model-len 2048 \
-        --gpu-memory-utilization 0.05 &
-    PID_EMBEDDING=$!
-    wait_for_ready $EMBEDDING_PORT
-
-    echo "[vLLM] Starting $MODEL1_NAME on port $MODEL1_PORT..."
-    CUDA_VISIBLE_DEVICES=0 python -m vllm.entrypoints.openai.api_server \
-        --model "$MODEL1_NAME" \
-        --served-model-name "Qwen2.5-14B-GPU1" \
-        --port $MODEL1_PORT \
-        --max-model-len 32000 \
-        --gpu-memory-utilization 0.90 \
-        --enforce-eager &
-    PID1=$!
-    wait_for_ready $MODEL1_PORT
-
-    echo "[vLLM] Starting $MODEL2_NAME on port $MODEL2_PORT..."
-    CUDA_VISIBLE_DEVICES=1 python -m vllm.entrypoints.openai.api_server \
+    echo "[vLLM] Starting $MODEL2_NAME on port $MODEL1_PORT (Optimized for NVIDIA H200 with 65k Context)..."
+    export VLLM_ALLOW_LONG_MAX_MODEL_LEN=1
+    python -m vllm.entrypoints.openai.api_server \
         --model "$MODEL2_NAME" \
-        --served-model-name "Qwen2.5-14B-GPU0" \
-        --port $MODEL2_PORT \
-        --max-model-len 8192 \
+        --served-model-name "Qwen2.5-14B-GPU0" "Qwen2.5-14B-GPU1" \
+        --port "$MODEL1_PORT" \
+        --max-model-len 65536 \
+        --max-num-seqs 256 \
+        --max-num-batched-tokens 65536 \
         --dtype bfloat16 \
-        --gpu-memory-utilization 0.85 &
-    PID2=$!
-    wait_for_ready $MODEL2_PORT
+        --gpu-memory-utilization 0.95 \
+        --trust-remote-code &
+    PID1=$!
+    wait_for_ready "$MODEL1_PORT"
 
-    echo "[vLLM] All servers ready."
+    echo "[vLLM] Server ready on port $MODEL1_PORT."
 }
 
 stop_vllm() {
-    echo "[vLLM] Stopping all vLLM servers..."
-    kill $PID_EMBEDDING $PID1 $PID2 2>/dev/null || true
-    # Also kill any stray vllm processes on our ports
-    fuser -k ${EMBEDDING_PORT}/tcp 2>/dev/null || true
-    fuser -k ${MODEL1_PORT}/tcp    2>/dev/null || true
-    fuser -k ${MODEL2_PORT}/tcp    2>/dev/null || true
-    sleep 5
-    echo "[vLLM] Servers stopped."
+    echo "[vLLM] Stopping vLLM server..."
+    kill $PID1 2>/dev/null || true
+    fuser -k ${MODEL1_PORT}/tcp 2>/dev/null || true
+    fuser -k ${MODEL2_PORT}/tcp 2>/dev/null || true
+    sleep 3
+    echo "[vLLM] Server stopped."
 }
 
 # Trap script exit/error/SIGINT/SIGTERM to guarantee cleanup
@@ -119,12 +101,14 @@ for TIMEOUT in "${TIMEOUTS[@]}"; do
     python cuad-demo.py \
         --k 5 \
         --j 4 \
-        --sample-budget 100 \
+        --sample-budget 300 \
         --seed 0 \
         --num-contracts 50 \
         --policy maxquality \
         --exp-name "${EXP_NAME}" \
-        --optimizer-strategy pareto
+        --optimizer-strategy pareto \
+        --model1-port "${MODEL1_PORT:-8005}" \
+        --model2-port "${MODEL2_PORT:-8005}"
 
     echo ""
     echo "[EXP] Finished: ${EXP_NAME}"
@@ -139,4 +123,6 @@ done
 echo "========================================================"
 echo " All experiments finished."
 echo " Results are in: opt-profiling-data/"
+echo " Generating timeout-specific presentation figures..."
 echo "========================================================"
+python analyze_operators_and_pareto.py

@@ -12,8 +12,10 @@ from palimpzest.constants import Model
 
 import litellm
 os.environ["SUPPRESS_LITELLM_LOGS"] = "True"
+os.environ["LITELLM_REQUEST_TIMEOUT"] = "120"
 litellm.suppress_handler_warnings = True
 litellm.suppress_debug_info = True
+litellm.request_timeout = 120.0
 # litellm._turn_on_debug()
 
 CUAD_CATEGORIES = [
@@ -654,6 +656,13 @@ def parse_arguments():
         help="A file with a dictionary mapping physical operator ids to prior belief on their performance",
     )
     parser.add_argument(
+        "--priors-mode",
+        default="with_belief",
+        type=str,
+        choices=["with_belief", "without_belief", "random_belief", "default", "none", "random", "reversed"],
+        help="Belief strategy: 'with_belief' (use true priors), 'without_belief' (no priors/cold-start), 'random_belief' (randomized priors), 'reversed' (adversarial worst-first)",
+    )
+    parser.add_argument(
         "--quality",
         default=None,
         type=float,
@@ -663,13 +672,30 @@ def parse_arguments():
         "--policy",
         default="maxquality",
         type=str,
-        help="One of 'mincost', 'mintime', 'maxquality'",
+        help="One of 'mincost', 'mintime', 'maxquality', 'maxqualityatfixedtime'",
+    )
+    parser.add_argument(
+        "--time-budget",
+        default=None,
+        type=float,
+        help="Time budget in seconds (used with --policy maxqualityatfixedtime)",
     )
     parser.add_argument(
         "--num-contracts",
         default=100,
         type=int,
         help="Number of contracts to evaluate",
+    )
+    
+    parser.add_argument(
+        "--model1-port",
+        default="8005",
+        help="Port for model 1 / GPU 0",
+    )
+    parser.add_argument(
+        "--model2-port",
+        default="8006",
+        help="Port for model 2 / GPU 1",
     )
     return parser.parse_args()
 
@@ -733,6 +759,8 @@ def main():
         policy = pz.MinCostAtFixedQuality(min_quality=args.quality)
     elif args.quality is not None and args.policy == "minlatencyatfixedquality":
         policy = pz.MinTimeAtFixedQuality(min_quality=args.quality)
+    elif args.time_budget is not None and args.policy == "maxqualityatfixedtime":
+        policy = pz.MaxQualityAtFixedTime(max_time=args.time_budget)
     print(f"USING POLICY: {policy}")
 
     # set models
@@ -744,8 +772,8 @@ def main():
     #     # Model.MIXTRAL, # NOTE: only available in tag `abacus-paper-experiments`
     #     Model.DEEPSEEK_R1_DISTILL_QWEN_1_5B,
     # ]
-    qwen_14b_gpu0 = pz.Model("Qwen2.5-14B-GPU0", api_base="http://localhost:8005/v1")                           
-    qwen_14b_gpu1 = pz.Model("Qwen2.5-14B-GPU1", api_base="http://localhost:8006/v1")                           
+    qwen_14b_gpu0 = pz.Model("Qwen2.5-14B-GPU0", api_base=f"http://localhost:{args.model1_port}/v1")                           
+    qwen_14b_gpu1 = pz.Model("Qwen2.5-14B-GPU1", api_base=f"http://localhost:{args.model2_port}/v1")                           
                                                                                                                 
     models = [qwen_14b_gpu0, qwen_14b_gpu1]                                    
 
@@ -762,9 +790,36 @@ def main():
         else args.exp_name
     )
     priors = None
-    if args.priors_file is not None:
+    if args.priors_mode in ["without_belief", "none"]:
+        priors = None
+        print("[INFO] Running WITHOUT BELIEF / PRIORS (Unbiased Cold Start exploration).")
+    elif args.priors_file is not None:
         with open(args.priors_file) as f:
             priors = json.load(f)
+            
+        if args.priors_mode in ["random_belief", "random"]:
+            # Randomize beliefs: shuffle prior values across operator keys
+            keys = list(priors.keys())
+            vals = list(priors.values())
+            np.random.seed(seed)
+            np.random.shuffle(vals)
+            priors = {k: v for k, v in zip(keys, vals)}
+            print("[INFO] Applied RANDOM beliefs/priors across all operators.")
+        elif args.priors_mode == "reversed":
+            # Invert beliefs: make low quality look high and high cost look low
+            max_c = max(v.get("cost", 0.0) for v in priors.values()) or 1.0
+            max_t = max(v.get("time", 0.0) for v in priors.values()) or 1.0
+            reversed_priors = {}
+            for k, v in priors.items():
+                reversed_priors[k] = {
+                    "quality": max(0.0, 1.0 - float(v.get("quality", 0.0))),
+                    "cost": max(0.001, max_c - float(v.get("cost", 0.0))),
+                    "time": max(0.1, max_t - float(v.get("time", 0.0)))
+                }
+            priors = reversed_priors
+            print("[INFO] Applied REVERSED (adversarial/worst-first) beliefs across all operators.")
+        else:
+            print("[INFO] Running WITH BELIEF (Standard offline profiling priors).")
 
     config = pz.QueryProcessorConfig(
         policy=policy,
@@ -772,7 +827,7 @@ def main():
         optimizer_strategy=optimizer_strategy,
         sentinel_execution_strategy=sentinel_strategy,
         execution_strategy=execution_strategy,
-        max_workers=64,
+        max_workers=16,
         available_models=models,
         allow_bonded_query=True,
         allow_critic=True,
@@ -828,6 +883,14 @@ def main():
     print(f"Plan Exec. cost: {data_record_collection.execution_stats.plan_execution_cost}")
     print(f"Total Execution time: {data_record_collection.execution_stats.total_execution_time}")
     print(f"Total Execution Cost: {data_record_collection.execution_stats.total_execution_cost}")
+
+    # Automatically generate presentation figures for live results
+    try:
+        from analyze_operators_and_pareto import main as generate_figures
+        print("\n[Auto-Plot] Generating presentation figures from experiment results...")
+        generate_figures()
+    except Exception as e:
+        print(f"[Auto-Plot Warning] Could not auto-generate figures: {e}")
 
 
 if __name__ == "__main__":
