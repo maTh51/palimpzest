@@ -1,0 +1,39 @@
+# Ignore generated artifacts and large data files
+
+# Presentation assets (static images, GIFs, PDFs)
+presentation_figures/
+*.png
+*.gif
+*.pdf
+
+# Large archive files
+*.tar.gz
+*.zip
+
+# Log and temporary text files
+*.log
+*.txt
+*.tmp
+
+# Scratch and temporary directories
+abacus-research/.polyaxon_downloads/
+abacus-research/uploads/
+abacus-research/term-recall-eval-errors/
+
+# Generated scripts and notebooks that are not core source
+abacus-research/generate_*.py
+abacus-research/patch_*.py
+abacus-research/modify_*.py
+abacus-research/debug_*.py
+abacus-research/run_*.sh
+abacus-research/*.sh
+
+# Python bytecode
+__pycache__/
+*.pyc
+
+# Jupyter notebook checkpoints
+.ipynb_checkpoints/
+
+# Environment files
+.env
