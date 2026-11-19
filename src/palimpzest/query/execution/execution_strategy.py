@@ -282,7 +282,11 @@ class SentinelExecutionStrategy(BaseExecutionStrategy, ABC):
     ) -> tuple[dict[int, list[tuple[DataRecordSet, PhysicalOperator, bool]]], dict[str, int]]:
         import datetime, time, os
 
-        def execute_op_wrapper(operator, source_indices, input):
+        run_start = {}  # sample idx -> time the sample actually started running (not queued)
+
+        def execute_op_wrapper(operator, source_indices, input, idx=None):
+            if idx is not None:
+                run_start[idx] = time.time()
             record_set = operator(input[0], input[1]) if isinstance(operator, JoinOp) else operator(input)
             return record_set, operator, source_indices, input
 
@@ -307,13 +311,17 @@ class SentinelExecutionStrategy(BaseExecutionStrategy, ABC):
             rs.input = input_data
             return rs
 
-        # resolve timeout: attribute takes priority, then env var
-        time_limit = getattr(self, "sample_timeout", None)
-        if time_limit is None and os.getenv("SAMPLE_TIMEOUT"):
-            try:
-                time_limit = float(os.getenv("SAMPLE_TIMEOUT"))
-            except ValueError:
-                pass
+        # resolve timeout: attribute takes priority, then DynamicTimeout (TIMEOUT_MODE=fixed|dynamic|none)
+        from palimpzest.query.execution.dynamic_timeout import DynamicTimeout
+        dyn = DynamicTimeout.get()
+        attr_limit = getattr(self, "sample_timeout", None)
+
+        def current_limit():
+            if attr_limit is not None:
+                return attr_limit, "attribute"
+            return dyn.timeout_for(unique_logical_op_id)
+
+        time_limit, _ = current_limit()
 
         # initialize mapping from source indices to output record sets
         source_indices_to_record_sets_and_ops = {source_indices: [] for _, source_indices, _ in op_inputs}
@@ -336,11 +344,22 @@ class SentinelExecutionStrategy(BaseExecutionStrategy, ABC):
 
         with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
             futures = [
-                executor.submit(execute_op_wrapper, operator, source_indices, input)
-                for operator, source_indices, input in final_op_inputs
+                executor.submit(execute_op_wrapper, operator, source_indices, input, i)
+                for i, (operator, source_indices, input) in enumerate(final_op_inputs)
             ]
             future_to_info = {fut: tup for fut, tup in zip(futures, final_op_inputs)}
-            future_to_start_time = {fut: time.time() for fut in futures}
+            future_to_idx = {fut: i for i, fut in enumerate(futures)}
+            future_to_start_time = {fut: time.time() for fut in futures}  # submit (queue) time
+
+            def run_elapsed(fut, now):
+                """Seconds since the sample started RUNNING; None if still queued."""
+                started = run_start.get(future_to_idx[fut])
+                return None if started is None else now - started
+
+            def queue_wait(fut):
+                started = run_start.get(future_to_idx[fut])
+                return 0.0 if started is None else started - future_to_start_time[fut]
+
             timeout_count = 0
 
             # ------------------------------------------------------------------
@@ -365,6 +384,8 @@ class SentinelExecutionStrategy(BaseExecutionStrategy, ABC):
                         remaining.discard(future)
                         operator, source_indices, input_data = future_to_info[future]
                         op_id = operator.get_full_op_id()
+                        elapsed = run_elapsed(future, time.time()) or 0.0
+                        lim, src = current_limit()
                         try:
                             record_set, operator, source_indices, input_data = future.result()
                             if isinstance(operator, JoinOp):
@@ -376,36 +397,39 @@ class SentinelExecutionStrategy(BaseExecutionStrategy, ABC):
                                 num_llm_ops += 1
                                 self.progress_manager.incr(unique_logical_op_id, num_samples=1, total_cost=record_set.get_total_cost())
                             output_record_sets.append((record_set, operator, source_indices, input_data))
+                            dyn.record(unique_logical_op_id, op_id, "ok", elapsed, queue_wait(future), lim, src)
                         except Exception as e:
                             logger.error(f"Error executing operator: {e}")
-                            elapsed = time.time() - future_to_start_time[future]
                             record_set = make_failed_record_set(operator, source_indices, input_data, elapsed)
                             if self._is_llm_op(operator):
                                 num_llm_ops += 1
                                 if self.progress_manager is not None:
                                     self.progress_manager.incr(unique_logical_op_id, num_samples=1, total_cost=0.0)
                             output_record_sets.append((record_set, operator, source_indices, input_data))
+                            dyn.record(unique_logical_op_id, op_id, "error", elapsed, queue_wait(future), lim, src)
                             print(f"\n[Sentinel Exception] Operator {op_id} failed: {e}.\n", flush=True)
 
-                    # wall-clock timeout check
+                    # wall-clock timeout check (limit re-evaluated: in dynamic mode it adapts as samples finish)
+                    time_limit, limit_src = current_limit()
                     if time_limit is not None:
                         now = time.time()
                         for future in list(remaining):
-                            elapsed = now - future_to_start_time[future]
-                            if elapsed > time_limit:
+                            elapsed = run_elapsed(future, now)
+                            if elapsed is not None and elapsed > time_limit:
                                 timeout_count += 1
                                 future.cancel()
                                 remaining.discard(future)
                                 operator, source_indices, input_data = future_to_info[future]
                                 op_id = operator.get_full_op_id()
                                 ts2 = datetime.datetime.now().strftime("[%H:%M:%S]")
-                                print(f"{ts2} [Sentinel Timeout] Operator {op_id} timed out (> {time_limit:.2f}s). Cancelling.", flush=True)
+                                print(f"{ts2} [Sentinel Timeout] Operator {op_id} timed out (> {time_limit:.2f}s, {limit_src}). Cancelling.", flush=True)
                                 record_set = make_failed_record_set(operator, source_indices, input_data, time_limit, "timeout-failed")
                                 if self._is_llm_op(operator):
                                     num_llm_ops += 1
                                     if self.progress_manager is not None:
                                         self.progress_manager.incr(unique_logical_op_id, num_samples=1, total_cost=0.0)
                                 output_record_sets.append((record_set, operator, source_indices, input_data))
+                                dyn.record(unique_logical_op_id, op_id, "timeout", elapsed, queue_wait(future), time_limit, limit_src)
 
             # ------------------------------------------------------------------
             # FULL PATH: mid-execution speculative Pareto pruning + timeout.

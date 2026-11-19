@@ -1,0 +1,3688 @@
+{
+  "axia-pilot-cuad-baseline": {
+    "exp": "axia-pilot-cuad-baseline",
+    "f1": 0.7706855791962175,
+    "precision": 0.7990196078431373,
+    "recall": 0.7442922374429224,
+    "rp@5": null,
+    "opt_time": 863.9426712989807,
+    "exec_time": 172.9661316871643,
+    "tot_time": 1036.908802986145,
+    "plan_str": "0. Schema['contract', 'contract_id', 'title'] -> MixtureOfAgentsConvert -> Schema['Affiliate License-Licensee', 'Affiliate License-Licensor', 'Agreement Date', 'Anti-Assignment', 'Audit Rights', 'Cap on Liability', 'Change of Control', 'Competitive Restriction Exception', 'Covenant Not to Sue', 'Document Name', 'Effective Date', 'Exclusivity', 'Expiration Date', 'Governing Law', 'IP Ownership Assignment', 'Insurance', 'Irrevocable or Perpetual License', 'Joint IP Ownership', 'License Grant', 'Liquidated Damages', 'Minimum Commitment', 'Most Favored Nation', 'No-Solicit of Customers', 'No-Solicit of Employees', 'Non-Compete', 'Non-Disparagement', 'Non-Transferable License', 'Notice Period to Terminate Renewal', 'Parties', 'Post-Termination Services', 'Price Restrictions', 'Renewal Term', 'Revenue/Profit Sharing', 'Rofr/Rofo/Rofn', 'Source Code Escrow', 'Termination for Convenience', 'Third Party Beneficiary', 'Uncapped Liability', 'Unlimited/All-You-Can-Eat-License', 'Volume Restriction', 'Warranty Duration', 'contract', 'contract_id', 'title']\n    (contract, contract_id, title) -> (Affiliate License-Licensee, Af)\n    Prompt Strategy: None\n    Reasoning Effort: default\n    Proposer Models: [Qwen2.5-14B-GPU0, Qwen2.5-14B-GPU1]\n    Temperatures: [0.8, 0.8]\n    Aggregator Model: Qwen2.5-14B-GPU0\n\n  1. MarshalAndScanDataOp(Dataset(schema=<class 'palimpzest.core.lib.schemas.Schema['contract', 'contract_id', 'title']'>, id=cuad, op_id=022b755afd)) -> <class 'palimpzest.core.lib.schemas.Schema['contract', 'contract_id', 'title']'>\n    (contract_id, title, contract)",
+    "phase1_out_tokens": 248944.0,
+    "phase2_out_tokens": 80177.0,
+    "total_out_tokens": 329121.0,
+    "phase1_op_executions": 0,
+    "max_rounds": 9,
+    "total_mab_samples_drawn": 45,
+    "ops": {
+      "0-022b755afd": {
+        "rounds": 9,
+        "global_total_samples": 10,
+        "samples_drawn_sum": 10,
+        "explored_ops": 1,
+        "total_ops": 1,
+        "converged": null,
+        "convergence_info": null,
+        "top_ops": [
+          {
+            "op_id": "022b755afd-f987dae6bd",
+            "class": "MarshalAndScanDataOp",
+            "strategy": null,
+            "samples": 10,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 1.0,
+            "lcb_q": 1.0,
+            "ucb_q": 1.0,
+            "mean_t": 0.0
+          }
+        ]
+      },
+      "1-81dd1f8073": {
+        "rounds": 9,
+        "global_total_samples": 45,
+        "samples_drawn_sum": 45,
+        "explored_ops": 7,
+        "total_ops": 7,
+        "converged": null,
+        "convergence_info": null,
+        "top_ops": [
+          {
+            "op_id": "81dd1f8073-06bd4f49c7",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 10,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 0.8014,
+            "lcb_q": 0.7099,
+            "ucb_q": 0.8929,
+            "mean_t": 91.14
+          },
+          {
+            "op_id": "81dd1f8073-2c0d6a7069",
+            "class": "LLMConvertBonded",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 4,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.7912,
+            "lcb_q": 0.6465,
+            "ucb_q": 0.9359,
+            "mean_t": 31.1
+          },
+          {
+            "op_id": "81dd1f8073-105d505161",
+            "class": "CritiqueAndRefineConvert",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 10,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.7728,
+            "lcb_q": 0.6813,
+            "ucb_q": 0.8643,
+            "mean_t": 73.48
+          },
+          {
+            "op_id": "81dd1f8073-2bc1fc30e9",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 6,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.6637,
+            "lcb_q": 0.5456,
+            "ucb_q": 0.7819,
+            "mean_t": 66.3
+          },
+          {
+            "op_id": "81dd1f8073-23b8bdc0a5",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 4,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.6292,
+            "lcb_q": 0.4844,
+            "ucb_q": 0.7739,
+            "mean_t": 91.06
+          },
+          {
+            "op_id": "81dd1f8073-28d1f7ecaf",
+            "class": "LLMConvertBonded",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 4,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.6076,
+            "lcb_q": 0.4629,
+            "ucb_q": 0.7523,
+            "mean_t": 7.7
+          },
+          {
+            "op_id": "81dd1f8073-0bc6edead1",
+            "class": "CritiqueAndRefineConvert",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 7,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.5047,
+            "lcb_q": 0.3953,
+            "ucb_q": 0.6141,
+            "mean_t": 62.66
+          }
+        ]
+      }
+    },
+    "early_stop_logs": []
+  },
+  "axia-pilot-cuad-es": {
+    "exp": "axia-pilot-cuad-es",
+    "f1": 0.7838479809976246,
+    "precision": 0.8168316831683168,
+    "recall": 0.7534246575342466,
+    "rp@5": null,
+    "opt_time": 283.9169681072235,
+    "exec_time": 230.35079407691956,
+    "tot_time": 514.2677621841431,
+    "plan_str": "0. Schema['contract', 'contract_id', 'title'] -> MixtureOfAgentsConvert -> Schema['Affiliate License-Licensee', 'Affiliate License-Licensor', 'Agreement Date', 'Anti-Assignment', 'Audit Rights', 'Cap on Liability', 'Change of Control', 'Competitive Restriction Exception', 'Covenant Not to Sue', 'Document Name', 'Effective Date', 'Exclusivity', 'Expiration Date', 'Governing Law', 'IP Ownership Assignment', 'Insurance', 'Irrevocable or Perpetual License', 'Joint IP Ownership', 'License Grant', 'Liquidated Damages', 'Minimum Commitment', 'Most Favored Nation', 'No-Solicit of Customers', 'No-Solicit of Employees', 'Non-Compete', 'Non-Disparagement', 'Non-Transferable License', 'Notice Period to Terminate Renewal', 'Parties', 'Post-Termination Services', 'Price Restrictions', 'Renewal Term', 'Revenue/Profit Sharing', 'Rofr/Rofo/Rofn', 'Source Code Escrow', 'Termination for Convenience', 'Third Party Beneficiary', 'Uncapped Liability', 'Unlimited/All-You-Can-Eat-License', 'Volume Restriction', 'Warranty Duration', 'contract', 'contract_id', 'title']\n    (contract, contract_id, title) -> (Affiliate License-Licensee, Af)\n    Prompt Strategy: None\n    Reasoning Effort: default\n    Proposer Models: [Qwen2.5-14B-GPU0, Qwen2.5-14B-GPU1]\n    Temperatures: [0.8, 0.8]\n    Aggregator Model: Qwen2.5-14B-GPU0\n\n  1. MarshalAndScanDataOp(Dataset(schema=<class 'palimpzest.core.lib.schemas.Schema['contract', 'contract_id', 'title']'>, id=cuad, op_id=022b755afd)) -> <class 'palimpzest.core.lib.schemas.Schema['contract', 'contract_id', 'title']'>\n    (contract_id, title, contract)",
+    "phase1_out_tokens": 92054.0,
+    "phase2_out_tokens": 107151.0,
+    "total_out_tokens": 199205.0,
+    "phase1_op_executions": 0,
+    "max_rounds": 3,
+    "total_mab_samples_drawn": 17,
+    "ops": {
+      "0-022b755afd": {
+        "rounds": 3,
+        "global_total_samples": 4,
+        "samples_drawn_sum": 4,
+        "explored_ops": 1,
+        "total_ops": 1,
+        "converged": true,
+        "convergence_info": null,
+        "top_ops": [
+          {
+            "op_id": "022b755afd-f987dae6bd",
+            "class": "MarshalAndScanDataOp",
+            "strategy": null,
+            "samples": 4,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 1.0,
+            "lcb_q": 1.0,
+            "ucb_q": 1.0,
+            "mean_t": 0.0
+          }
+        ]
+      },
+      "1-81dd1f8073": {
+        "rounds": 3,
+        "global_total_samples": 17,
+        "samples_drawn_sum": 17,
+        "explored_ops": 5,
+        "total_ops": 5,
+        "converged": true,
+        "convergence_info": {
+          "reason": "futility",
+          "leader": "81dd1f8073-06bd4f49c7",
+          "runner_up": "81dd1f8073-105d505161",
+          "mean_leader": 0.7801442307692307,
+          "mean_runner_up": 0.7693798449612403,
+          "n_leader": 4,
+          "n_runner_up": 4,
+          "sigma": 0.28284652819390665,
+          "z": 1.645,
+          "remaining_budget_share": 28.0,
+          "update": 3
+        },
+        "top_ops": [
+          {
+            "op_id": "81dd1f8073-06bd4f49c7",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 4,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 0.7801,
+            "lcb_q": 0.629,
+            "ucb_q": 0.9313,
+            "mean_t": 86.44
+          },
+          {
+            "op_id": "81dd1f8073-105d505161",
+            "class": null,
+            "strategy": null,
+            "samples": 4,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.7694,
+            "lcb_q": 0.6182,
+            "ucb_q": 0.9205,
+            "mean_t": 62.3
+          },
+          {
+            "op_id": "81dd1f8073-23b8bdc0a5",
+            "class": null,
+            "strategy": null,
+            "samples": 4,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.6274,
+            "lcb_q": 0.4763,
+            "ucb_q": 0.7785,
+            "mean_t": 94.66
+          },
+          {
+            "op_id": "81dd1f8073-28d1f7ecaf",
+            "class": null,
+            "strategy": null,
+            "samples": 2,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.5417,
+            "lcb_q": 0.3279,
+            "ucb_q": 0.7554,
+            "mean_t": 3.53
+          },
+          {
+            "op_id": "81dd1f8073-0bc6edead1",
+            "class": "CritiqueAndRefineConvert",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 3,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.421,
+            "lcb_q": 0.2465,
+            "ucb_q": 0.5955,
+            "mean_t": 59.21
+          }
+        ]
+      }
+    },
+    "early_stop_logs": []
+  },
+  "axia-pilot-biodex-baseline": {
+    "exp": "axia-pilot-biodex-baseline",
+    "f1": null,
+    "precision": null,
+    "recall": null,
+    "rp@5": 0.32,
+    "opt_time": 1068.1777048110962,
+    "exec_time": 398.6816816329956,
+    "tot_time": 1466.8593864440918,
+    "plan_str": "0. Schema['abstract', 'fulltext', 'pmid', 'reaction_labels', 'reactions', 'title'] -> MixtureOfAgentsConvert -> Schema['abstract', 'fulltext', 'pmid', 'ranked_reaction_labels', 'reaction_labels', 'reactions', 'title']\n    (abstract, fulltext, pmid, reac) -> (abstract, fulltext, pmid, rank)\n    Prompt Strategy: None\n    Reasoning Effort: default\n    Proposer Models: [Qwen2.5-14B-GPU0, Qwen2.5-14B-GPU1]\n    Temperatures: [0.8, 0.8]\n    Aggregator Model: Qwen2.5-14B-GPU0\n\n  1. Schema['abstract', 'fulltext', 'pmid', 'reactions', 'title'] -> TopKOp -> Schema['abstract', 'fulltext', 'pmid', 'reaction_labels', 'reactions', 'title']\n    (abstract, fulltext, pmid, reac) -> (abstract, fulltext, pmid, reac)\n    Top-K: Collection with k=15\n\n    2. Schema['abstract', 'fulltext', 'pmid', 'title'] -> LLMConvertBonded -> Schema['abstract', 'fulltext', 'pmid', 'reactions', 'title']\n    (abstract, fulltext, pmid, titl) -> (abstract, fulltext, pmid, reac)\n    Model: Qwen2.5-14B-GPU1\n    Prompt Strategy: PromptStrategy.MAP\n    Reasoning Effort: default\n\n      3. MarshalAndScanDataOp(Dataset(schema=<class 'palimpzest.core.lib.schemas.Schema['abstract', 'fulltext', 'pmid', 'title']'>, id=biodex, op_id=4bb7f58f1d)) -> <class 'palimpzest.core.lib.schemas.Schema['abstract', 'fulltext', 'pmid', 'title']'>\n    (pmid, title, abstract, fulltex)",
+    "phase1_out_tokens": 263819.0,
+    "phase2_out_tokens": 167647.0,
+    "total_out_tokens": 431466.0,
+    "phase1_op_executions": 0,
+    "max_rounds": 6,
+    "total_mab_samples_drawn": 88,
+    "ops": {
+      "0-4bb7f58f1d": {
+        "rounds": 6,
+        "global_total_samples": 7,
+        "samples_drawn_sum": 7,
+        "explored_ops": 1,
+        "total_ops": 1,
+        "converged": null,
+        "convergence_info": null,
+        "top_ops": [
+          {
+            "op_id": "4bb7f58f1d-2341ca6947",
+            "class": "MarshalAndScanDataOp",
+            "strategy": null,
+            "samples": 7,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 1.0,
+            "lcb_q": 1.0,
+            "ucb_q": 1.0,
+            "mean_t": 0.0
+          }
+        ]
+      },
+      "1-2aa5d04bc1": {
+        "rounds": 6,
+        "global_total_samples": 29,
+        "samples_drawn_sum": 29,
+        "explored_ops": 5,
+        "total_ops": 5,
+        "converged": null,
+        "convergence_info": null,
+        "top_ops": [
+          {
+            "op_id": "2aa5d04bc1-06bd4f49c7",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 7,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 0.3537,
+            "lcb_q": 0.2476,
+            "ucb_q": 0.4599,
+            "mean_t": 52.12
+          },
+          {
+            "op_id": "2aa5d04bc1-105d505161",
+            "class": "CritiqueAndRefineConvert",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 6,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.346,
+            "lcb_q": 0.2314,
+            "ucb_q": 0.4607,
+            "mean_t": 71.5
+          },
+          {
+            "op_id": "2aa5d04bc1-28d1f7ecaf",
+            "class": "LLMConvertBonded",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 6,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.3071,
+            "lcb_q": 0.1925,
+            "ucb_q": 0.4218,
+            "mean_t": 22.96
+          },
+          {
+            "op_id": "2aa5d04bc1-23b8bdc0a5",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 7,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.2612,
+            "lcb_q": 0.1551,
+            "ucb_q": 0.3674,
+            "mean_t": 45.0
+          },
+          {
+            "op_id": "2aa5d04bc1-0bc6edead1",
+            "class": "CritiqueAndRefineConvert",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 3,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.0476,
+            "lcb_q": -0.1145,
+            "ucb_q": 0.2098,
+            "mean_t": 133.29
+          }
+        ]
+      },
+      "2-7991bbf1ca": {
+        "rounds": 6,
+        "global_total_samples": 30,
+        "samples_drawn_sum": 30,
+        "explored_ops": 5,
+        "total_ops": 5,
+        "converged": null,
+        "convergence_info": null,
+        "top_ops": [
+          {
+            "op_id": "7991bbf1ca-69999e193d",
+            "class": "TopKOp",
+            "strategy": null,
+            "samples": 7,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 0.5932,
+            "lcb_q": 0.3961,
+            "ucb_q": 0.7903,
+            "mean_t": 0.07
+          },
+          {
+            "op_id": "7991bbf1ca-30c2d46df0",
+            "class": "TopKOp",
+            "strategy": null,
+            "samples": 7,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.5082,
+            "lcb_q": 0.3111,
+            "ucb_q": 0.7052,
+            "mean_t": 0.1
+          },
+          {
+            "op_id": "7991bbf1ca-78304785bd",
+            "class": "TopKOp",
+            "strategy": null,
+            "samples": 7,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.5082,
+            "lcb_q": 0.3111,
+            "ucb_q": 0.7052,
+            "mean_t": 0.1
+          },
+          {
+            "op_id": "7991bbf1ca-936410cac8",
+            "class": "TopKOp",
+            "strategy": null,
+            "samples": 6,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.4556,
+            "lcb_q": 0.2427,
+            "ucb_q": 0.6684,
+            "mean_t": 0.03
+          },
+          {
+            "op_id": "7991bbf1ca-2e19943c6a",
+            "class": "TopKOp",
+            "strategy": null,
+            "samples": 3,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.0278,
+            "lcb_q": -0.2732,
+            "ucb_q": 0.3288,
+            "mean_t": 0.19
+          }
+        ]
+      },
+      "3-7b7b565330": {
+        "rounds": 6,
+        "global_total_samples": 29,
+        "samples_drawn_sum": 29,
+        "explored_ops": 5,
+        "total_ops": 5,
+        "converged": null,
+        "convergence_info": null,
+        "top_ops": [
+          {
+            "op_id": "7b7b565330-06bd4f49c7",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 7,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 0.3833,
+            "lcb_q": 0.2504,
+            "ucb_q": 0.5163,
+            "mean_t": 43.37
+          },
+          {
+            "op_id": "7b7b565330-0bc6edead1",
+            "class": "CritiqueAndRefineConvert",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 7,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.3357,
+            "lcb_q": 0.2028,
+            "ucb_q": 0.4686,
+            "mean_t": 44.83
+          },
+          {
+            "op_id": "7b7b565330-105d505161",
+            "class": "CritiqueAndRefineConvert",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 7,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.3357,
+            "lcb_q": 0.2028,
+            "ucb_q": 0.4686,
+            "mean_t": 42.72
+          },
+          {
+            "op_id": "7b7b565330-28d1f7ecaf",
+            "class": "LLMConvertBonded",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 6,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.2333,
+            "lcb_q": 0.0897,
+            "ucb_q": 0.3769,
+            "mean_t": 8.91
+          },
+          {
+            "op_id": "7b7b565330-23b8bdc0a5",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 2,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.0,
+            "lcb_q": -0.2487,
+            "ucb_q": 0.2487,
+            "mean_t": 36.91
+          }
+        ]
+      }
+    },
+    "early_stop_logs": []
+  },
+  "axia-pilot-biodex-es": {
+    "exp": "axia-pilot-biodex-es",
+    "max_rounds": 3,
+    "total_mab_samples_drawn": 53,
+    "ops": {
+      "0-4bb7f58f1d": {
+        "rounds": 3,
+        "global_total_samples": 4,
+        "samples_drawn_sum": 4,
+        "explored_ops": 1,
+        "total_ops": 1,
+        "converged": true,
+        "convergence_info": null,
+        "top_ops": [
+          {
+            "op_id": "4bb7f58f1d-2341ca6947",
+            "class": "MarshalAndScanDataOp",
+            "strategy": null,
+            "samples": 4,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 1.0,
+            "lcb_q": 1.0,
+            "ucb_q": 1.0,
+            "mean_t": 0.0
+          }
+        ]
+      },
+      "1-2aa5d04bc1": {
+        "rounds": 3,
+        "global_total_samples": 18,
+        "samples_drawn_sum": 18,
+        "explored_ops": 6,
+        "total_ops": 6,
+        "converged": true,
+        "convergence_info": {
+          "reason": "futility",
+          "leader": "2aa5d04bc1-23b8bdc0a5",
+          "runner_up": "2aa5d04bc1-06bd4f49c7",
+          "mean_leader": 0.42142857142857143,
+          "mean_runner_up": 0.37142857142857144,
+          "n_leader": 4,
+          "n_runner_up": 4,
+          "sigma": 0.42837296992287477,
+          "z": 1.645,
+          "remaining_budget_share": 16.333333333333332,
+          "update": 3
+        },
+        "top_ops": [
+          {
+            "op_id": "2aa5d04bc1-23b8bdc0a5",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 4,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 0.4214,
+            "lcb_q": 0.2423,
+            "ucb_q": 0.6005,
+            "mean_t": 59.34
+          },
+          {
+            "op_id": "2aa5d04bc1-06bd4f49c7",
+            "class": null,
+            "strategy": null,
+            "samples": 4,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.3714,
+            "lcb_q": 0.1923,
+            "ucb_q": 0.5505,
+            "mean_t": 51.18
+          },
+          {
+            "op_id": "2aa5d04bc1-0bc6edead1",
+            "class": "CritiqueAndRefineConvert",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 3,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.0476,
+            "lcb_q": -0.1592,
+            "ucb_q": 0.2544,
+            "mean_t": 73.9
+          },
+          {
+            "op_id": "2aa5d04bc1-105d505161",
+            "class": "CritiqueAndRefineConvert",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 3,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.0476,
+            "lcb_q": -0.1592,
+            "ucb_q": 0.2544,
+            "mean_t": 65.95
+          },
+          {
+            "op_id": "2aa5d04bc1-28d1f7ecaf",
+            "class": "LLMConvertBonded",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 2,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.0,
+            "lcb_q": -0.2533,
+            "ucb_q": 0.2533,
+            "mean_t": 95.16
+          },
+          {
+            "op_id": "2aa5d04bc1-2bc1fc30e9",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 2,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.0,
+            "lcb_q": -0.2533,
+            "ucb_q": 0.2533,
+            "mean_t": 99.98
+          }
+        ]
+      },
+      "2-7991bbf1ca": {
+        "rounds": 3,
+        "global_total_samples": 17,
+        "samples_drawn_sum": 17,
+        "explored_ops": 5,
+        "total_ops": 5,
+        "converged": true,
+        "convergence_info": {
+          "reason": "efficacy",
+          "leader": "7991bbf1ca-69999e193d",
+          "runner_up": "7991bbf1ca-78304785bd",
+          "mean_leader": 0.45476190476190476,
+          "mean_runner_up": 0.13333333333333333,
+          "n_leader": 4,
+          "n_runner_up": 4,
+          "sigma": 0.25140572286754287,
+          "z": 1.645,
+          "remaining_budget_share": 16.333333333333332,
+          "update": 3
+        },
+        "top_ops": [
+          {
+            "op_id": "7991bbf1ca-69999e193d",
+            "class": "TopKOp",
+            "strategy": null,
+            "samples": 4,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 0.4548,
+            "lcb_q": 0.2634,
+            "ucb_q": 0.6461,
+            "mean_t": 0.07
+          },
+          {
+            "op_id": "7991bbf1ca-78304785bd",
+            "class": null,
+            "strategy": null,
+            "samples": 4,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.1333,
+            "lcb_q": -0.058,
+            "ucb_q": 0.3247,
+            "mean_t": 0.07
+          },
+          {
+            "op_id": "7991bbf1ca-30c2d46df0",
+            "class": null,
+            "strategy": null,
+            "samples": 4,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.0833,
+            "lcb_q": -0.108,
+            "ucb_q": 0.2747,
+            "mean_t": 0.07
+          },
+          {
+            "op_id": "7991bbf1ca-2e19943c6a",
+            "class": "TopKOp",
+            "strategy": null,
+            "samples": 3,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.0556,
+            "lcb_q": -0.1654,
+            "ucb_q": 0.2765,
+            "mean_t": 0.09
+          },
+          {
+            "op_id": "7991bbf1ca-936410cac8",
+            "class": "TopKOp",
+            "strategy": null,
+            "samples": 2,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.0,
+            "lcb_q": -0.2706,
+            "ucb_q": 0.2706,
+            "mean_t": 0.01
+          }
+        ]
+      },
+      "3-7b7b565330": {
+        "rounds": 3,
+        "global_total_samples": 18,
+        "samples_drawn_sum": 18,
+        "explored_ops": 6,
+        "total_ops": 6,
+        "converged": true,
+        "convergence_info": {
+          "reason": "futility",
+          "leader": "7b7b565330-06bd4f49c7",
+          "runner_up": "7b7b565330-105d505161",
+          "mean_leader": 0.43333333333333335,
+          "mean_runner_up": 0.35,
+          "n_leader": 4,
+          "n_runner_up": 4,
+          "sigma": 0.3815174380753199,
+          "z": 1.645,
+          "remaining_budget_share": 16.333333333333332,
+          "update": 3
+        },
+        "top_ops": [
+          {
+            "op_id": "7b7b565330-06bd4f49c7",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 4,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 0.4333,
+            "lcb_q": 0.2492,
+            "ucb_q": 0.6175,
+            "mean_t": 33.76
+          },
+          {
+            "op_id": "7b7b565330-105d505161",
+            "class": null,
+            "strategy": null,
+            "samples": 4,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.35,
+            "lcb_q": 0.1658,
+            "ucb_q": 0.5342,
+            "mean_t": 54.93
+          },
+          {
+            "op_id": "7b7b565330-0bc6edead1",
+            "class": null,
+            "strategy": null,
+            "samples": 4,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.1,
+            "lcb_q": -0.0842,
+            "ucb_q": 0.2842,
+            "mean_t": 58.37
+          },
+          {
+            "op_id": "7b7b565330-23b8bdc0a5",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 2,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.0,
+            "lcb_q": -0.2605,
+            "ucb_q": 0.2605,
+            "mean_t": 32.43
+          },
+          {
+            "op_id": "7b7b565330-28d1f7ecaf",
+            "class": "LLMConvertBonded",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 2,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.0,
+            "lcb_q": -0.2605,
+            "ucb_q": 0.2605,
+            "mean_t": 5.02
+          },
+          {
+            "op_id": "7b7b565330-2bc1fc30e9",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 2,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.0,
+            "lcb_q": -0.2605,
+            "ucb_q": 0.2605,
+            "mean_t": 9.38
+          }
+        ]
+      }
+    },
+    "early_stop_logs": []
+  },
+  "axia-cuad-pilot-baseline": {
+    "exp": "axia-cuad-pilot-baseline",
+    "f1": 0.8009950248756219,
+    "precision": 0.8797814207650273,
+    "recall": 0.7351598173515982,
+    "rp@5": null,
+    "opt_time": 9573.489423036575,
+    "exec_time": 323.25480103492737,
+    "tot_time": 9896.744224071503,
+    "plan_str": "0. Schema['contract', 'contract_id', 'title'] -> LLMConvertBonded -> Schema['Affiliate License-Licensee', 'Affiliate License-Licensor', 'Agreement Date', 'Anti-Assignment', 'Audit Rights', 'Cap on Liability', 'Change of Control', 'Competitive Restriction Exception', 'Covenant Not to Sue', 'Document Name', 'Effective Date', 'Exclusivity', 'Expiration Date', 'Governing Law', 'IP Ownership Assignment', 'Insurance', 'Irrevocable or Perpetual License', 'Joint IP Ownership', 'License Grant', 'Liquidated Damages', 'Minimum Commitment', 'Most Favored Nation', 'No-Solicit of Customers', 'No-Solicit of Employees', 'Non-Compete', 'Non-Disparagement', 'Non-Transferable License', 'Notice Period to Terminate Renewal', 'Parties', 'Post-Termination Services', 'Price Restrictions', 'Renewal Term', 'Revenue/Profit Sharing', 'Rofr/Rofo/Rofn', 'Source Code Escrow', 'Termination for Convenience', 'Third Party Beneficiary', 'Uncapped Liability', 'Unlimited/All-You-Can-Eat-License', 'Volume Restriction', 'Warranty Duration', 'contract', 'contract_id', 'title']\n    (contract, contract_id, title) -> (Affiliate License-Licensee, Af)\n    Model: Qwen2.5-14B-GPU1\n    Prompt Strategy: PromptStrategy.MAP\n    Reasoning Effort: default\n\n  1. MarshalAndScanDataOp(Dataset(schema=<class 'palimpzest.core.lib.schemas.Schema['contract', 'contract_id', 'title']'>, id=cuad, op_id=022b755afd)) -> <class 'palimpzest.core.lib.schemas.Schema['contract', 'contract_id', 'title']'>\n    (contract_id, title, contract)",
+    "phase1_out_tokens": 232485.0,
+    "phase2_out_tokens": 32936.0,
+    "total_out_tokens": 265421.0,
+    "phase1_op_executions": 0,
+    "max_rounds": 9,
+    "total_mab_samples_drawn": 41,
+    "ops": {
+      "0-022b755afd": {
+        "rounds": 9,
+        "global_total_samples": 10,
+        "samples_drawn_sum": 10,
+        "explored_ops": 1,
+        "total_ops": 1,
+        "converged": null,
+        "convergence_info": null,
+        "top_ops": [
+          {
+            "op_id": "022b755afd-f987dae6bd",
+            "class": "MarshalAndScanDataOp",
+            "strategy": null,
+            "samples": 10,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 1.0,
+            "lcb_q": 1.0,
+            "ucb_q": 1.0,
+            "mean_t": 0.0
+          }
+        ]
+      },
+      "1-81dd1f8073": {
+        "rounds": 9,
+        "global_total_samples": 41,
+        "samples_drawn_sum": 41,
+        "explored_ops": 5,
+        "total_ops": 5,
+        "converged": null,
+        "convergence_info": null,
+        "top_ops": [
+          {
+            "op_id": "81dd1f8073-28d1f7ecaf",
+            "class": "LLMConvertBonded",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 8,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 0.8132,
+            "lcb_q": 0.7885,
+            "ucb_q": 0.8378,
+            "mean_t": 170.17
+          },
+          {
+            "op_id": "81dd1f8073-105d505161",
+            "class": "CritiqueAndRefineConvert",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 10,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.8076,
+            "lcb_q": 0.7855,
+            "ucb_q": 0.8296,
+            "mean_t": 887.3
+          },
+          {
+            "op_id": "81dd1f8073-23b8bdc0a5",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 10,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.7978,
+            "lcb_q": 0.7757,
+            "ucb_q": 0.8198,
+            "mean_t": 939.62
+          },
+          {
+            "op_id": "81dd1f8073-0bc6edead1",
+            "class": "CritiqueAndRefineConvert",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 10,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.7633,
+            "lcb_q": 0.7412,
+            "ucb_q": 0.7853,
+            "mean_t": 914.06
+          },
+          {
+            "op_id": "81dd1f8073-06bd4f49c7",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 3,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.7408,
+            "lcb_q": 0.7006,
+            "ucb_q": 0.7811,
+            "mean_t": 889.73
+          }
+        ]
+      }
+    },
+    "early_stop_logs": []
+  },
+  "axia-cuad-pilot-es": {
+    "exp": "axia-cuad-pilot-es",
+    "f1": 0.8192219679633866,
+    "precision": 0.8211009174311926,
+    "recall": 0.817351598173516,
+    "rp@5": null,
+    "opt_time": 2524.140105485916,
+    "exec_time": 2785.56374001503,
+    "tot_time": 5309.703845500946,
+    "plan_str": "0. Schema['contract', 'contract_id', 'title'] -> MixtureOfAgentsConvert -> Schema['Affiliate License-Licensee', 'Affiliate License-Licensor', 'Agreement Date', 'Anti-Assignment', 'Audit Rights', 'Cap on Liability', 'Change of Control', 'Competitive Restriction Exception', 'Covenant Not to Sue', 'Document Name', 'Effective Date', 'Exclusivity', 'Expiration Date', 'Governing Law', 'IP Ownership Assignment', 'Insurance', 'Irrevocable or Perpetual License', 'Joint IP Ownership', 'License Grant', 'Liquidated Damages', 'Minimum Commitment', 'Most Favored Nation', 'No-Solicit of Customers', 'No-Solicit of Employees', 'Non-Compete', 'Non-Disparagement', 'Non-Transferable License', 'Notice Period to Terminate Renewal', 'Parties', 'Post-Termination Services', 'Price Restrictions', 'Renewal Term', 'Revenue/Profit Sharing', 'Rofr/Rofo/Rofn', 'Source Code Escrow', 'Termination for Convenience', 'Third Party Beneficiary', 'Uncapped Liability', 'Unlimited/All-You-Can-Eat-License', 'Volume Restriction', 'Warranty Duration', 'contract', 'contract_id', 'title']\n    (contract, contract_id, title) -> (Affiliate License-Licensee, Af)\n    Prompt Strategy: None\n    Reasoning Effort: default\n    Proposer Models: [Qwen2.5-14B-GPU0, Qwen2.5-14B-GPU1]\n    Temperatures: [0.8, 0.8]\n    Aggregator Model: Qwen2.5-14B-GPU1\n\n  1. MarshalAndScanDataOp(Dataset(schema=<class 'palimpzest.core.lib.schemas.Schema['contract', 'contract_id', 'title']'>, id=cuad, op_id=022b755afd)) -> <class 'palimpzest.core.lib.schemas.Schema['contract', 'contract_id', 'title']'>\n    (contract_id, title, contract)",
+    "phase1_out_tokens": 84282.0,
+    "phase2_out_tokens": 63172.0,
+    "total_out_tokens": 147454.0,
+    "phase1_op_executions": 0,
+    "max_rounds": 3,
+    "total_mab_samples_drawn": 17,
+    "ops": {
+      "0-022b755afd": {
+        "rounds": 3,
+        "global_total_samples": 4,
+        "samples_drawn_sum": 4,
+        "explored_ops": 1,
+        "total_ops": 1,
+        "converged": true,
+        "convergence_info": null,
+        "top_ops": [
+          {
+            "op_id": "022b755afd-f987dae6bd",
+            "class": "MarshalAndScanDataOp",
+            "strategy": null,
+            "samples": 4,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 1.0,
+            "lcb_q": 1.0,
+            "ucb_q": 1.0,
+            "mean_t": 0.0
+          }
+        ]
+      },
+      "1-81dd1f8073": {
+        "rounds": 3,
+        "global_total_samples": 17,
+        "samples_drawn_sum": 17,
+        "explored_ops": 5,
+        "total_ops": 5,
+        "converged": true,
+        "convergence_info": {
+          "reason": "futility",
+          "leader": "81dd1f8073-23b8bdc0a5",
+          "runner_up": "81dd1f8073-0bc6edead1",
+          "mean_leader": 0.8388888888888889,
+          "mean_runner_up": 0.8281944611318034,
+          "n_leader": 4,
+          "n_runner_up": 4,
+          "sigma": 0.10437599342279072,
+          "z": 1.645,
+          "remaining_budget_share": 28.0,
+          "update": 3
+        },
+        "top_ops": [
+          {
+            "op_id": "81dd1f8073-23b8bdc0a5",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 4,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 0.8389,
+            "lcb_q": 0.8009,
+            "ucb_q": 0.8769,
+            "mean_t": 759.11
+          },
+          {
+            "op_id": "81dd1f8073-0bc6edead1",
+            "class": null,
+            "strategy": null,
+            "samples": 4,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.8282,
+            "lcb_q": 0.7902,
+            "ucb_q": 0.8662,
+            "mean_t": 692.16
+          },
+          {
+            "op_id": "81dd1f8073-06bd4f49c7",
+            "class": null,
+            "strategy": null,
+            "samples": 4,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.822,
+            "lcb_q": 0.784,
+            "ucb_q": 0.86,
+            "mean_t": 831.15
+          },
+          {
+            "op_id": "81dd1f8073-28d1f7ecaf",
+            "class": null,
+            "strategy": null,
+            "samples": 2,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.7989,
+            "lcb_q": 0.7452,
+            "ucb_q": 0.8526,
+            "mean_t": 182.9
+          },
+          {
+            "op_id": "81dd1f8073-105d505161",
+            "class": "CritiqueAndRefineConvert",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 3,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.7486,
+            "lcb_q": 0.7048,
+            "ucb_q": 0.7925,
+            "mean_t": 781.48
+          }
+        ]
+      }
+    },
+    "early_stop_logs": []
+  },
+  "axia-biodex-pilot-baseline": {
+    "exp": "axia-biodex-pilot-baseline",
+    "f1": null,
+    "precision": null,
+    "recall": null,
+    "rp@5": 0.38249999999999995,
+    "opt_time": 5829.137458324432,
+    "exec_time": 270.9728698730469,
+    "tot_time": 6100.110328197479,
+    "plan_str": "0. Schema['abstract', 'fulltext', 'pmid', 'reaction_labels', 'reactions', 'title'] -> LLMConvertBonded -> Schema['abstract', 'fulltext', 'pmid', 'ranked_reaction_labels', 'reaction_labels', 'reactions', 'title']\n    (abstract, fulltext, pmid, reac) -> (abstract, fulltext, pmid, rank)\n    Model: Qwen2.5-14B-GPU1\n    Prompt Strategy: PromptStrategy.MAP\n    Reasoning Effort: default\n\n  1. Schema['abstract', 'fulltext', 'pmid', 'reactions', 'title'] -> TopKOp -> Schema['abstract', 'fulltext', 'pmid', 'reaction_labels', 'reactions', 'title']\n    (abstract, fulltext, pmid, reac) -> (abstract, fulltext, pmid, reac)\n    Top-K: Collection with k=20\n\n    2. Schema['abstract', 'fulltext', 'pmid', 'title'] -> LLMConvertBonded -> Schema['abstract', 'fulltext', 'pmid', 'reactions', 'title']\n    (abstract, fulltext, pmid, titl) -> (abstract, fulltext, pmid, reac)\n    Model: Qwen2.5-14B-GPU1\n    Prompt Strategy: PromptStrategy.MAP\n    Reasoning Effort: default\n\n      3. MarshalAndScanDataOp(Dataset(schema=<class 'palimpzest.core.lib.schemas.Schema['abstract', 'fulltext', 'pmid', 'title']'>, id=biodex, op_id=4bb7f58f1d)) -> <class 'palimpzest.core.lib.schemas.Schema['abstract', 'fulltext', 'pmid', 'title']'>\n    (pmid, title, abstract, fulltex)",
+    "phase1_out_tokens": 154447.0,
+    "phase2_out_tokens": 38297.0,
+    "total_out_tokens": 192744.0,
+    "phase1_op_executions": 0,
+    "max_rounds": 5,
+    "total_mab_samples_drawn": 94,
+    "ops": {
+      "0-4bb7f58f1d": {
+        "rounds": 5,
+        "global_total_samples": 6,
+        "samples_drawn_sum": 6,
+        "explored_ops": 1,
+        "total_ops": 1,
+        "converged": null,
+        "convergence_info": null,
+        "top_ops": [
+          {
+            "op_id": "4bb7f58f1d-2341ca6947",
+            "class": "MarshalAndScanDataOp",
+            "strategy": null,
+            "samples": 6,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 1.0,
+            "lcb_q": 1.0,
+            "ucb_q": 1.0,
+            "mean_t": 0.0
+          }
+        ]
+      },
+      "1-2aa5d04bc1": {
+        "rounds": 5,
+        "global_total_samples": 43,
+        "samples_drawn_sum": 43,
+        "explored_ops": 10,
+        "total_ops": 10,
+        "converged": null,
+        "convergence_info": null,
+        "top_ops": [
+          {
+            "op_id": "2aa5d04bc1-06bd4f49c7",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 6,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 0.4143,
+            "lcb_q": 0.3837,
+            "ucb_q": 0.4448,
+            "mean_t": 474.64
+          },
+          {
+            "op_id": "2aa5d04bc1-0bc6edead1",
+            "class": "CritiqueAndRefineConvert",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 4,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.3857,
+            "lcb_q": 0.3483,
+            "ucb_q": 0.4231,
+            "mean_t": 456.34
+          },
+          {
+            "op_id": "2aa5d04bc1-105d505161",
+            "class": "CritiqueAndRefineConvert",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 4,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.3857,
+            "lcb_q": 0.3483,
+            "ucb_q": 0.4231,
+            "mean_t": 408.68
+          },
+          {
+            "op_id": "2aa5d04bc1-23b8bdc0a5",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 4,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.3857,
+            "lcb_q": 0.3483,
+            "ucb_q": 0.4231,
+            "mean_t": 421.89
+          },
+          {
+            "op_id": "2aa5d04bc1-28d1f7ecaf",
+            "class": "LLMConvertBonded",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 4,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.3857,
+            "lcb_q": 0.3483,
+            "ucb_q": 0.4231,
+            "mean_t": 91.9
+          },
+          {
+            "op_id": "2aa5d04bc1-2bc1fc30e9",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 4,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.3857,
+            "lcb_q": 0.3483,
+            "ucb_q": 0.4231,
+            "mean_t": 207.0
+          },
+          {
+            "op_id": "2aa5d04bc1-2c0d6a7069",
+            "class": "LLMConvertBonded",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 4,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.3857,
+            "lcb_q": 0.3483,
+            "ucb_q": 0.4231,
+            "mean_t": 121.84
+          },
+          {
+            "op_id": "2aa5d04bc1-2d67f97ebd",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 4,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.3857,
+            "lcb_q": 0.3483,
+            "ucb_q": 0.4231,
+            "mean_t": 270.12
+          }
+        ]
+      },
+      "2-7991bbf1ca": {
+        "rounds": 5,
+        "global_total_samples": 26,
+        "samples_drawn_sum": 26,
+        "explored_ops": 5,
+        "total_ops": 5,
+        "converged": null,
+        "convergence_info": null,
+        "top_ops": [
+          {
+            "op_id": "7991bbf1ca-69999e193d",
+            "class": "TopKOp",
+            "strategy": null,
+            "samples": 6,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 0.6127,
+            "lcb_q": 0.425,
+            "ucb_q": 0.8004,
+            "mean_t": 0.11
+          },
+          {
+            "op_id": "7991bbf1ca-78304785bd",
+            "class": "TopKOp",
+            "strategy": null,
+            "samples": 6,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.6032,
+            "lcb_q": 0.4154,
+            "ucb_q": 0.7909,
+            "mean_t": 0.09
+          },
+          {
+            "op_id": "7991bbf1ca-30c2d46df0",
+            "class": "TopKOp",
+            "strategy": null,
+            "samples": 6,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.5698,
+            "lcb_q": 0.3821,
+            "ucb_q": 0.7576,
+            "mean_t": 0.09
+          },
+          {
+            "op_id": "7991bbf1ca-936410cac8",
+            "class": "TopKOp",
+            "strategy": null,
+            "samples": 5,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.5352,
+            "lcb_q": 0.3296,
+            "ucb_q": 0.7409,
+            "mean_t": 0.06
+          },
+          {
+            "op_id": "7991bbf1ca-2e19943c6a",
+            "class": "TopKOp",
+            "strategy": null,
+            "samples": 3,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.1032,
+            "lcb_q": -0.1623,
+            "ucb_q": 0.3687,
+            "mean_t": 0.17
+          }
+        ]
+      },
+      "3-7b7b565330": {
+        "rounds": 5,
+        "global_total_samples": 25,
+        "samples_drawn_sum": 25,
+        "explored_ops": 5,
+        "total_ops": 5,
+        "converged": null,
+        "convergence_info": null,
+        "top_ops": [
+          {
+            "op_id": "7b7b565330-28d1f7ecaf",
+            "class": "LLMConvertBonded",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 5,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 0.3467,
+            "lcb_q": 0.2076,
+            "ucb_q": 0.4857,
+            "mean_t": 146.99
+          },
+          {
+            "op_id": "7b7b565330-06bd4f49c7",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 6,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.3167,
+            "lcb_q": 0.1897,
+            "ucb_q": 0.4436,
+            "mean_t": 601.2
+          },
+          {
+            "op_id": "7b7b565330-23b8bdc0a5",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 6,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.2889,
+            "lcb_q": 0.1619,
+            "ucb_q": 0.4158,
+            "mean_t": 556.05
+          },
+          {
+            "op_id": "7b7b565330-0bc6edead1",
+            "class": "CritiqueAndRefineConvert",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 6,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.2333,
+            "lcb_q": 0.1064,
+            "ucb_q": 0.3603,
+            "mean_t": 559.45
+          },
+          {
+            "op_id": "7b7b565330-105d505161",
+            "class": "CritiqueAndRefineConvert",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 2,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.0,
+            "lcb_q": -0.2199,
+            "ucb_q": 0.2199,
+            "mean_t": 477.1
+          }
+        ]
+      }
+    },
+    "early_stop_logs": []
+  },
+  "axia-biodex-pilot-es": {
+    "exp": "axia-biodex-pilot-es",
+    "f1": null,
+    "precision": null,
+    "recall": null,
+    "rp@5": 0.44250000000000006,
+    "opt_time": 4581.6184549331665,
+    "exec_time": 3503.544022321701,
+    "tot_time": 8085.162477254868,
+    "plan_str": "0. Schema['abstract', 'fulltext', 'pmid', 'reaction_labels', 'reactions', 'title'] -> MixtureOfAgentsConvert -> Schema['abstract', 'fulltext', 'pmid', 'ranked_reaction_labels', 'reaction_labels', 'reactions', 'title']\n    (abstract, fulltext, pmid, reac) -> (abstract, fulltext, pmid, rank)\n    Prompt Strategy: None\n    Reasoning Effort: default\n    Proposer Models: [Qwen2.5-14B-GPU0, Qwen2.5-14B-GPU1]\n    Temperatures: [0.8, 0.8]\n    Aggregator Model: Qwen2.5-14B-GPU1\n\n  1. Schema['abstract', 'fulltext', 'pmid', 'reactions', 'title'] -> TopKOp -> Schema['abstract', 'fulltext', 'pmid', 'reaction_labels', 'reactions', 'title']\n    (abstract, fulltext, pmid, reac) -> (abstract, fulltext, pmid, reac)\n    Top-K: Collection with k=15\n\n    2. Schema['abstract', 'fulltext', 'pmid', 'title'] -> CritiqueAndRefineConvert -> Schema['abstract', 'fulltext', 'pmid', 'reactions', 'title']\n    (abstract, fulltext, pmid, titl) -> (abstract, fulltext, pmid, reac)\n    Model: Qwen2.5-14B-GPU1\n    Prompt Strategy: PromptStrategy.MAP\n    Reasoning Effort: default\n    Critic Model: Qwen2.5-14B-GPU0\n    Refine Model: Qwen2.5-14B-GPU1\n\n      3. MarshalAndScanDataOp(Dataset(schema=<class 'palimpzest.core.lib.schemas.Schema['abstract', 'fulltext', 'pmid', 'title']'>, id=biodex, op_id=4bb7f58f1d)) -> <class 'palimpzest.core.lib.schemas.Schema['abstract', 'fulltext', 'pmid', 'title']'>\n    (pmid, title, abstract, fulltex)",
+    "phase1_out_tokens": 113835.0,
+    "phase2_out_tokens": 95005.0,
+    "total_out_tokens": 208840.0,
+    "phase1_op_executions": 0,
+    "max_rounds": 4,
+    "total_mab_samples_drawn": 63,
+    "ops": {
+      "0-4bb7f58f1d": {
+        "rounds": 4,
+        "global_total_samples": 5,
+        "samples_drawn_sum": 5,
+        "explored_ops": 1,
+        "total_ops": 1,
+        "converged": true,
+        "convergence_info": null,
+        "top_ops": [
+          {
+            "op_id": "4bb7f58f1d-2341ca6947",
+            "class": "MarshalAndScanDataOp",
+            "strategy": null,
+            "samples": 5,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 1.0,
+            "lcb_q": 1.0,
+            "ucb_q": 1.0,
+            "mean_t": 0.0
+          }
+        ]
+      },
+      "1-2aa5d04bc1": {
+        "rounds": 4,
+        "global_total_samples": 26,
+        "samples_drawn_sum": 26,
+        "explored_ops": 7,
+        "total_ops": 7,
+        "converged": true,
+        "convergence_info": {
+          "reason": "futility",
+          "leader": "2aa5d04bc1-06bd4f49c7",
+          "runner_up": "2aa5d04bc1-0bc6edead1",
+          "mean_leader": 0.38571428571428573,
+          "mean_runner_up": 0.38571428571428573,
+          "n_leader": 4,
+          "n_runner_up": 4,
+          "sigma": 0.38736318291599026,
+          "z": 1.645,
+          "remaining_budget_share": 36.0,
+          "update": 4
+        },
+        "top_ops": [
+          {
+            "op_id": "2aa5d04bc1-06bd4f49c7",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 4,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 0.3857,
+            "lcb_q": 0.2729,
+            "ucb_q": 0.4985,
+            "mean_t": 397.57
+          },
+          {
+            "op_id": "2aa5d04bc1-0bc6edead1",
+            "class": null,
+            "strategy": null,
+            "samples": 4,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 0.3857,
+            "lcb_q": 0.2729,
+            "ucb_q": 0.4985,
+            "mean_t": 390.58
+          },
+          {
+            "op_id": "2aa5d04bc1-23b8bdc0a5",
+            "class": null,
+            "strategy": null,
+            "samples": 5,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.3371,
+            "lcb_q": 0.2362,
+            "ucb_q": 0.438,
+            "mean_t": 369.55
+          },
+          {
+            "op_id": "2aa5d04bc1-28d1f7ecaf",
+            "class": null,
+            "strategy": null,
+            "samples": 3,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.181,
+            "lcb_q": 0.0507,
+            "ucb_q": 0.3112,
+            "mean_t": 103.64
+          },
+          {
+            "op_id": "2aa5d04bc1-2bc1fc30e9",
+            "class": null,
+            "strategy": null,
+            "samples": 3,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.181,
+            "lcb_q": 0.0507,
+            "ucb_q": 0.3112,
+            "mean_t": 201.1
+          },
+          {
+            "op_id": "2aa5d04bc1-2c0d6a7069",
+            "class": null,
+            "strategy": null,
+            "samples": 3,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.181,
+            "lcb_q": 0.0507,
+            "ucb_q": 0.3112,
+            "mean_t": 149.89
+          },
+          {
+            "op_id": "2aa5d04bc1-105d505161",
+            "class": "CritiqueAndRefineConvert",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 4,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.1357,
+            "lcb_q": 0.0229,
+            "ucb_q": 0.2485,
+            "mean_t": 397.88
+          }
+        ]
+      },
+      "2-7991bbf1ca": {
+        "rounds": 4,
+        "global_total_samples": 19,
+        "samples_drawn_sum": 19,
+        "explored_ops": 6,
+        "total_ops": 6,
+        "converged": true,
+        "convergence_info": {
+          "reason": "futility",
+          "leader": "7991bbf1ca-69999e193d",
+          "runner_up": "7991bbf1ca-78304785bd",
+          "mean_leader": 0.45476190476190476,
+          "mean_runner_up": 0.41904761904761906,
+          "n_leader": 4,
+          "n_runner_up": 4,
+          "sigma": 0.3817996530337467,
+          "z": 1.645,
+          "remaining_budget_share": 18.0,
+          "update": 3
+        },
+        "top_ops": [
+          {
+            "op_id": "7991bbf1ca-69999e193d",
+            "class": "TopKOp",
+            "strategy": null,
+            "samples": 5,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 0.5638,
+            "lcb_q": 0.3635,
+            "ucb_q": 0.7642,
+            "mean_t": 0.08
+          },
+          {
+            "op_id": "7991bbf1ca-78304785bd",
+            "class": "TopKOp",
+            "strategy": null,
+            "samples": 4,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.419,
+            "lcb_q": 0.1951,
+            "ucb_q": 0.643,
+            "mean_t": 0.08
+          },
+          {
+            "op_id": "7991bbf1ca-936410cac8",
+            "class": "TopKOp",
+            "strategy": null,
+            "samples": 2,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.2381,
+            "lcb_q": -0.0787,
+            "ucb_q": 0.5549,
+            "mean_t": 0.05
+          },
+          {
+            "op_id": "7991bbf1ca-2e19943c6a",
+            "class": "TopKOp",
+            "strategy": null,
+            "samples": 3,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.1032,
+            "lcb_q": -0.1555,
+            "ucb_q": 0.3618,
+            "mean_t": 0.1
+          },
+          {
+            "op_id": "7991bbf1ca-30c2d46df0",
+            "class": "TopKOp",
+            "strategy": null,
+            "samples": 3,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.1032,
+            "lcb_q": -0.1555,
+            "ucb_q": 0.3618,
+            "mean_t": 0.1
+          },
+          {
+            "op_id": "7991bbf1ca-ab40525544",
+            "class": "TopKOp",
+            "strategy": null,
+            "samples": 2,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.0417,
+            "lcb_q": -0.2751,
+            "ucb_q": 0.3584,
+            "mean_t": 0.04
+          }
+        ]
+      },
+      "3-7b7b565330": {
+        "rounds": 4,
+        "global_total_samples": 18,
+        "samples_drawn_sum": 18,
+        "explored_ops": 5,
+        "total_ops": 5,
+        "converged": true,
+        "convergence_info": {
+          "reason": "futility",
+          "leader": "7b7b565330-0bc6edead1",
+          "runner_up": "7b7b565330-105d505161",
+          "mean_leader": 0.35,
+          "mean_runner_up": 0.35,
+          "n_leader": 4,
+          "n_runner_up": 4,
+          "sigma": 0.47258156262526085,
+          "z": 1.645,
+          "remaining_budget_share": 18.0,
+          "update": 3
+        },
+        "top_ops": [
+          {
+            "op_id": "7b7b565330-105d505161",
+            "class": "CritiqueAndRefineConvert",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 4,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 0.35,
+            "lcb_q": 0.2296,
+            "ucb_q": 0.4704,
+            "mean_t": 687.74
+          },
+          {
+            "op_id": "7b7b565330-23b8bdc0a5",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 4,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 0.35,
+            "lcb_q": 0.2296,
+            "ucb_q": 0.4704,
+            "mean_t": 669.03
+          },
+          {
+            "op_id": "7b7b565330-0bc6edead1",
+            "class": "CritiqueAndRefineConvert",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 5,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.28,
+            "lcb_q": 0.1723,
+            "ucb_q": 0.3877,
+            "mean_t": 692.81
+          },
+          {
+            "op_id": "7b7b565330-28d1f7ecaf",
+            "class": "LLMConvertBonded",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 2,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.2,
+            "lcb_q": 0.0297,
+            "ucb_q": 0.3703,
+            "mean_t": 225.79
+          },
+          {
+            "op_id": "7b7b565330-06bd4f49c7",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 3,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.0667,
+            "lcb_q": -0.0724,
+            "ucb_q": 0.2057,
+            "mean_t": 685.9
+          }
+        ]
+      }
+    },
+    "early_stop_logs": []
+  },
+  "axia-cuad-full-s0-baseline": {
+    "exp": "axia-cuad-full-s0-baseline",
+    "f1": 0.775,
+    "precision": 0.8886438809261301,
+    "recall": 0.6871270247229326,
+    "rp@5": null,
+    "opt_time": 25506.172384500504,
+    "exec_time": 1284.764568567276,
+    "tot_time": 26790.93695306778,
+    "plan_str": "0. Schema['contract', 'contract_id', 'title'] -> LLMConvertBonded -> Schema['Affiliate License-Licensee', 'Affiliate License-Licensor', 'Agreement Date', 'Anti-Assignment', 'Audit Rights', 'Cap on Liability', 'Change of Control', 'Competitive Restriction Exception', 'Covenant Not to Sue', 'Document Name', 'Effective Date', 'Exclusivity', 'Expiration Date', 'Governing Law', 'IP Ownership Assignment', 'Insurance', 'Irrevocable or Perpetual License', 'Joint IP Ownership', 'License Grant', 'Liquidated Damages', 'Minimum Commitment', 'Most Favored Nation', 'No-Solicit of Customers', 'No-Solicit of Employees', 'Non-Compete', 'Non-Disparagement', 'Non-Transferable License', 'Notice Period to Terminate Renewal', 'Parties', 'Post-Termination Services', 'Price Restrictions', 'Renewal Term', 'Revenue/Profit Sharing', 'Rofr/Rofo/Rofn', 'Source Code Escrow', 'Termination for Convenience', 'Third Party Beneficiary', 'Uncapped Liability', 'Unlimited/All-You-Can-Eat-License', 'Volume Restriction', 'Warranty Duration', 'contract', 'contract_id', 'title']\n    (contract, contract_id, title) -> (Affiliate License-Licensee, Af)\n    Model: Qwen2.5-14B-GPU1\n    Prompt Strategy: PromptStrategy.MAP\n    Reasoning Effort: default\n\n  1. MarshalAndScanDataOp(Dataset(schema=<class 'palimpzest.core.lib.schemas.Schema['contract', 'contract_id', 'title']'>, id=cuad, op_id=022b755afd)) -> <class 'palimpzest.core.lib.schemas.Schema['contract', 'contract_id', 'title']'>\n    (contract_id, title, contract)",
+    "phase1_out_tokens": 536575.0,
+    "phase2_out_tokens": 158613.0,
+    "total_out_tokens": 695188.0,
+    "phase1_op_executions": 0,
+    "max_rounds": 17,
+    "total_mab_samples_drawn": 103,
+    "ops": {
+      "0-022b755afd": {
+        "rounds": 17,
+        "global_total_samples": 20,
+        "samples_drawn_sum": 20,
+        "explored_ops": 1,
+        "total_ops": 1,
+        "converged": null,
+        "convergence_info": null,
+        "top_ops": [
+          {
+            "op_id": "022b755afd-f987dae6bd",
+            "class": "MarshalAndScanDataOp",
+            "strategy": null,
+            "samples": 20,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 1.0,
+            "lcb_q": 1.0,
+            "ucb_q": 1.0,
+            "mean_t": 0.0
+          }
+        ]
+      },
+      "1-81dd1f8073": {
+        "rounds": 17,
+        "global_total_samples": 103,
+        "samples_drawn_sum": 103,
+        "explored_ops": 6,
+        "total_ops": 6,
+        "converged": null,
+        "convergence_info": null,
+        "top_ops": [
+          {
+            "op_id": "81dd1f8073-28d1f7ecaf",
+            "class": "LLMConvertBonded",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 20,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 0.7486,
+            "lcb_q": 0.6696,
+            "ucb_q": 0.8277,
+            "mean_t": 439.25
+          },
+          {
+            "op_id": "81dd1f8073-23b8bdc0a5",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 20,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.7446,
+            "lcb_q": 0.6655,
+            "ucb_q": 0.8237,
+            "mean_t": 1342.93
+          },
+          {
+            "op_id": "81dd1f8073-2bc1fc30e9",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 19,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.7425,
+            "lcb_q": 0.6613,
+            "ucb_q": 0.8236,
+            "mean_t": 638.44
+          },
+          {
+            "op_id": "81dd1f8073-0bc6edead1",
+            "class": "CritiqueAndRefineConvert",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 20,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.7115,
+            "lcb_q": 0.6324,
+            "ucb_q": 0.7906,
+            "mean_t": 1155.49
+          },
+          {
+            "op_id": "81dd1f8073-105d505161",
+            "class": "CritiqueAndRefineConvert",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 20,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.6801,
+            "lcb_q": 0.601,
+            "ucb_q": 0.7592,
+            "mean_t": 1146.22
+          },
+          {
+            "op_id": "81dd1f8073-06bd4f49c7",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 4,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.4201,
+            "lcb_q": 0.2432,
+            "ucb_q": 0.5969,
+            "mean_t": 2625.86
+          }
+        ]
+      }
+    },
+    "early_stop_logs": []
+  },
+  "axia-cuad-full-s0-es": {
+    "exp": "axia-cuad-full-s0-es",
+    "f1": 0.7208480565371024,
+    "precision": 0.8836633663366337,
+    "recall": 0.6086956521739131,
+    "rp@5": null,
+    "opt_time": 9743.746569871902,
+    "exec_time": 15400.447116851807,
+    "tot_time": 25144.19368672371,
+    "plan_str": "0. Schema['contract', 'contract_id', 'title'] -> MixtureOfAgentsConvert -> Schema['Affiliate License-Licensee', 'Affiliate License-Licensor', 'Agreement Date', 'Anti-Assignment', 'Audit Rights', 'Cap on Liability', 'Change of Control', 'Competitive Restriction Exception', 'Covenant Not to Sue', 'Document Name', 'Effective Date', 'Exclusivity', 'Expiration Date', 'Governing Law', 'IP Ownership Assignment', 'Insurance', 'Irrevocable or Perpetual License', 'Joint IP Ownership', 'License Grant', 'Liquidated Damages', 'Minimum Commitment', 'Most Favored Nation', 'No-Solicit of Customers', 'No-Solicit of Employees', 'Non-Compete', 'Non-Disparagement', 'Non-Transferable License', 'Notice Period to Terminate Renewal', 'Parties', 'Post-Termination Services', 'Price Restrictions', 'Renewal Term', 'Revenue/Profit Sharing', 'Rofr/Rofo/Rofn', 'Source Code Escrow', 'Termination for Convenience', 'Third Party Beneficiary', 'Uncapped Liability', 'Unlimited/All-You-Can-Eat-License', 'Volume Restriction', 'Warranty Duration', 'contract', 'contract_id', 'title']\n    (contract, contract_id, title) -> (Affiliate License-Licensee, Af)\n    Prompt Strategy: None\n    Reasoning Effort: default\n    Proposer Models: [Qwen2.5-14B-GPU0, Qwen2.5-14B-GPU1]\n    Temperatures: [0.8, 0.8]\n    Aggregator Model: Qwen2.5-14B-GPU1\n\n  1. MarshalAndScanDataOp(Dataset(schema=<class 'palimpzest.core.lib.schemas.Schema['contract', 'contract_id', 'title']'>, id=cuad, op_id=022b755afd)) -> <class 'palimpzest.core.lib.schemas.Schema['contract', 'contract_id', 'title']'>\n    (contract_id, title, contract)",
+    "phase1_out_tokens": 189682.0,
+    "phase2_out_tokens": 222210.0,
+    "total_out_tokens": 411892.0,
+    "phase1_op_executions": 0,
+    "max_rounds": 3,
+    "total_mab_samples_drawn": 36,
+    "ops": {
+      "0-022b755afd": {
+        "rounds": 3,
+        "global_total_samples": 6,
+        "samples_drawn_sum": 6,
+        "explored_ops": 1,
+        "total_ops": 1,
+        "converged": true,
+        "convergence_info": null,
+        "top_ops": [
+          {
+            "op_id": "022b755afd-f987dae6bd",
+            "class": "MarshalAndScanDataOp",
+            "strategy": null,
+            "samples": 6,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 1.0,
+            "lcb_q": 1.0,
+            "ucb_q": 1.0,
+            "mean_t": 0.0
+          }
+        ]
+      },
+      "1-81dd1f8073": {
+        "rounds": 3,
+        "global_total_samples": 36,
+        "samples_drawn_sum": 36,
+        "explored_ops": 7,
+        "total_ops": 7,
+        "converged": true,
+        "convergence_info": {
+          "reason": "futility",
+          "leader": "81dd1f8073-23b8bdc0a5",
+          "runner_up": "81dd1f8073-0bc6edead1",
+          "mean_leader": 0.8180083014674642,
+          "mean_runner_up": 0.7907929724713735,
+          "n_leader": 6,
+          "n_runner_up": 6,
+          "sigma": 0.2604110929868643,
+          "z": 1.645,
+          "remaining_budget_share": 69.0,
+          "update": 3
+        },
+        "top_ops": [
+          {
+            "op_id": "81dd1f8073-23b8bdc0a5",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 6,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 0.818,
+            "lcb_q": 0.6583,
+            "ucb_q": 0.9777,
+            "mean_t": 2045.33
+          },
+          {
+            "op_id": "81dd1f8073-0bc6edead1",
+            "class": null,
+            "strategy": null,
+            "samples": 6,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.7908,
+            "lcb_q": 0.6311,
+            "ucb_q": 0.9505,
+            "mean_t": 1965.04
+          },
+          {
+            "op_id": "81dd1f8073-28d1f7ecaf",
+            "class": null,
+            "strategy": null,
+            "samples": 6,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.7755,
+            "lcb_q": 0.6157,
+            "ucb_q": 0.9352,
+            "mean_t": 585.89
+          },
+          {
+            "op_id": "81dd1f8073-2bc1fc30e9",
+            "class": null,
+            "strategy": null,
+            "samples": 5,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.632,
+            "lcb_q": 0.457,
+            "ucb_q": 0.8069,
+            "mean_t": 1083.48
+          },
+          {
+            "op_id": "81dd1f8073-2c0d6a7069",
+            "class": null,
+            "strategy": null,
+            "samples": 5,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.5935,
+            "lcb_q": 0.4185,
+            "ucb_q": 0.7684,
+            "mean_t": 1598.56
+          },
+          {
+            "op_id": "81dd1f8073-105d505161",
+            "class": "CritiqueAndRefineConvert",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 4,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.4084,
+            "lcb_q": 0.2128,
+            "ucb_q": 0.604,
+            "mean_t": 2175.14
+          },
+          {
+            "op_id": "81dd1f8073-06bd4f49c7",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 4,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.4047,
+            "lcb_q": 0.2091,
+            "ucb_q": 0.6003,
+            "mean_t": 3328.97
+          }
+        ]
+      }
+    },
+    "early_stop_logs": []
+  },
+  "axia-cuad-full-s1-baseline": {
+    "exp": "axia-cuad-full-s1-baseline",
+    "f1": 0.6290692342961944,
+    "precision": 0.8828828828828829,
+    "recall": 0.4886039886039886,
+    "rp@5": null,
+    "opt_time": 33029.06920337677,
+    "exec_time": 4369.985706567764,
+    "tot_time": 37399.054909944534,
+    "plan_str": "0. Schema['contract', 'contract_id', 'title'] -> MixtureOfAgentsConvert -> Schema['Affiliate License-Licensee', 'Affiliate License-Licensor', 'Agreement Date', 'Anti-Assignment', 'Audit Rights', 'Cap on Liability', 'Change of Control', 'Competitive Restriction Exception', 'Covenant Not to Sue', 'Document Name', 'Effective Date', 'Exclusivity', 'Expiration Date', 'Governing Law', 'IP Ownership Assignment', 'Insurance', 'Irrevocable or Perpetual License', 'Joint IP Ownership', 'License Grant', 'Liquidated Damages', 'Minimum Commitment', 'Most Favored Nation', 'No-Solicit of Customers', 'No-Solicit of Employees', 'Non-Compete', 'Non-Disparagement', 'Non-Transferable License', 'Notice Period to Terminate Renewal', 'Parties', 'Post-Termination Services', 'Price Restrictions', 'Renewal Term', 'Revenue/Profit Sharing', 'Rofr/Rofo/Rofn', 'Source Code Escrow', 'Termination for Convenience', 'Third Party Beneficiary', 'Uncapped Liability', 'Unlimited/All-You-Can-Eat-License', 'Volume Restriction', 'Warranty Duration', 'contract', 'contract_id', 'title']\n    (contract, contract_id, title) -> (Affiliate License-Licensee, Af)\n    Prompt Strategy: None\n    Reasoning Effort: default\n    Proposer Models: [Qwen2.5-14B-GPU1]\n    Temperatures: [0.0]\n    Aggregator Model: Qwen2.5-14B-GPU0\n\n  1. MarshalAndScanDataOp(Dataset(schema=<class 'palimpzest.core.lib.schemas.Schema['contract', 'contract_id', 'title']'>, id=cuad, op_id=022b755afd)) -> <class 'palimpzest.core.lib.schemas.Schema['contract', 'contract_id', 'title']'>\n    (contract_id, title, contract)",
+    "phase1_out_tokens": 558004.0,
+    "phase2_out_tokens": 176739.0,
+    "total_out_tokens": 734743.0,
+    "phase1_op_executions": 0,
+    "max_rounds": 17,
+    "total_mab_samples_drawn": 103,
+    "ops": {
+      "0-022b755afd": {
+        "rounds": 17,
+        "global_total_samples": 20,
+        "samples_drawn_sum": 20,
+        "explored_ops": 1,
+        "total_ops": 1,
+        "converged": null,
+        "convergence_info": null,
+        "top_ops": [
+          {
+            "op_id": "022b755afd-f987dae6bd",
+            "class": "MarshalAndScanDataOp",
+            "strategy": null,
+            "samples": 20,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 1.0,
+            "lcb_q": 1.0,
+            "ucb_q": 1.0,
+            "mean_t": 0.0
+          }
+        ]
+      },
+      "1-81dd1f8073": {
+        "rounds": 17,
+        "global_total_samples": 103,
+        "samples_drawn_sum": 103,
+        "explored_ops": 6,
+        "total_ops": 6,
+        "converged": null,
+        "convergence_info": null,
+        "top_ops": [
+          {
+            "op_id": "81dd1f8073-2bc1fc30e9",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 19,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 0.8035,
+            "lcb_q": 0.7507,
+            "ucb_q": 0.8563,
+            "mean_t": 664.84
+          },
+          {
+            "op_id": "81dd1f8073-105d505161",
+            "class": "CritiqueAndRefineConvert",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 20,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.7972,
+            "lcb_q": 0.7457,
+            "ucb_q": 0.8487,
+            "mean_t": 1349.69
+          },
+          {
+            "op_id": "81dd1f8073-28d1f7ecaf",
+            "class": "LLMConvertBonded",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 20,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.7804,
+            "lcb_q": 0.7289,
+            "ucb_q": 0.8319,
+            "mean_t": 406.66
+          },
+          {
+            "op_id": "81dd1f8073-23b8bdc0a5",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 20,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.7704,
+            "lcb_q": 0.7189,
+            "ucb_q": 0.8219,
+            "mean_t": 1811.92
+          },
+          {
+            "op_id": "81dd1f8073-06bd4f49c7",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 20,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.7336,
+            "lcb_q": 0.6821,
+            "ucb_q": 0.7851,
+            "mean_t": 1833.68
+          },
+          {
+            "op_id": "81dd1f8073-0bc6edead1",
+            "class": "CritiqueAndRefineConvert",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 4,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.5896,
+            "lcb_q": 0.4745,
+            "ucb_q": 0.7047,
+            "mean_t": 2575.69
+          }
+        ]
+      }
+    },
+    "early_stop_logs": []
+  },
+  "axia-cuad-full-s1-es": {
+    "exp": "axia-cuad-full-s1-es",
+    "f1": 0.6525270758122744,
+    "precision": 0.8903940886699507,
+    "recall": 0.5149572649572649,
+    "rp@5": null,
+    "opt_time": 9201.221341133118,
+    "exec_time": 3289.6702868938446,
+    "tot_time": 12490.891628026962,
+    "plan_str": "0. Schema['contract', 'contract_id', 'title'] -> MixtureOfAgentsConvert -> Schema['Affiliate License-Licensee', 'Affiliate License-Licensor', 'Agreement Date', 'Anti-Assignment', 'Audit Rights', 'Cap on Liability', 'Change of Control', 'Competitive Restriction Exception', 'Covenant Not to Sue', 'Document Name', 'Effective Date', 'Exclusivity', 'Expiration Date', 'Governing Law', 'IP Ownership Assignment', 'Insurance', 'Irrevocable or Perpetual License', 'Joint IP Ownership', 'License Grant', 'Liquidated Damages', 'Minimum Commitment', 'Most Favored Nation', 'No-Solicit of Customers', 'No-Solicit of Employees', 'Non-Compete', 'Non-Disparagement', 'Non-Transferable License', 'Notice Period to Terminate Renewal', 'Parties', 'Post-Termination Services', 'Price Restrictions', 'Renewal Term', 'Revenue/Profit Sharing', 'Rofr/Rofo/Rofn', 'Source Code Escrow', 'Termination for Convenience', 'Third Party Beneficiary', 'Uncapped Liability', 'Unlimited/All-You-Can-Eat-License', 'Volume Restriction', 'Warranty Duration', 'contract', 'contract_id', 'title']\n    (contract, contract_id, title) -> (Affiliate License-Licensee, Af)\n    Prompt Strategy: None\n    Reasoning Effort: default\n    Proposer Models: [Qwen2.5-14B-GPU1]\n    Temperatures: [0.0]\n    Aggregator Model: Qwen2.5-14B-GPU0\n\n  1. MarshalAndScanDataOp(Dataset(schema=<class 'palimpzest.core.lib.schemas.Schema['contract', 'contract_id', 'title']'>, id=cuad, op_id=022b755afd)) -> <class 'palimpzest.core.lib.schemas.Schema['contract', 'contract_id', 'title']'>\n    (contract_id, title, contract)",
+    "phase1_out_tokens": 176092.0,
+    "phase2_out_tokens": 173689.0,
+    "total_out_tokens": 349781.0,
+    "phase1_op_executions": 0,
+    "max_rounds": 3,
+    "total_mab_samples_drawn": 33,
+    "ops": {
+      "0-022b755afd": {
+        "rounds": 3,
+        "global_total_samples": 6,
+        "samples_drawn_sum": 6,
+        "explored_ops": 1,
+        "total_ops": 1,
+        "converged": true,
+        "convergence_info": null,
+        "top_ops": [
+          {
+            "op_id": "022b755afd-f987dae6bd",
+            "class": "MarshalAndScanDataOp",
+            "strategy": null,
+            "samples": 6,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 1.0,
+            "lcb_q": 1.0,
+            "ucb_q": 1.0,
+            "mean_t": 0.0
+          }
+        ]
+      },
+      "1-81dd1f8073": {
+        "rounds": 3,
+        "global_total_samples": 33,
+        "samples_drawn_sum": 33,
+        "explored_ops": 6,
+        "total_ops": 6,
+        "converged": true,
+        "convergence_info": {
+          "reason": "futility",
+          "leader": "81dd1f8073-2bc1fc30e9",
+          "runner_up": "81dd1f8073-0bc6edead1",
+          "mean_leader": 0.7941213923076497,
+          "mean_runner_up": 0.7828598561931895,
+          "n_leader": 5,
+          "n_runner_up": 6,
+          "sigma": 0.2050805404313556,
+          "z": 1.645,
+          "remaining_budget_share": 72.0,
+          "update": 3
+        },
+        "top_ops": [
+          {
+            "op_id": "81dd1f8073-2bc1fc30e9",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 5,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 0.7941,
+            "lcb_q": 0.5464,
+            "ucb_q": 1.0419,
+            "mean_t": 909.95
+          },
+          {
+            "op_id": "81dd1f8073-0bc6edead1",
+            "class": null,
+            "strategy": null,
+            "samples": 6,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.7829,
+            "lcb_q": 0.5567,
+            "ucb_q": 1.009,
+            "mean_t": 2080.49
+          },
+          {
+            "op_id": "81dd1f8073-28d1f7ecaf",
+            "class": null,
+            "strategy": null,
+            "samples": 6,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.7651,
+            "lcb_q": 0.5389,
+            "ucb_q": 0.9913,
+            "mean_t": 495.34
+          },
+          {
+            "op_id": "81dd1f8073-23b8bdc0a5",
+            "class": null,
+            "strategy": null,
+            "samples": 6,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.7369,
+            "lcb_q": 0.5108,
+            "ucb_q": 0.9631,
+            "mean_t": 2069.81
+          },
+          {
+            "op_id": "81dd1f8073-06bd4f49c7",
+            "class": null,
+            "strategy": null,
+            "samples": 6,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.6895,
+            "lcb_q": 0.4633,
+            "ucb_q": 0.9156,
+            "mean_t": 2561.59
+          },
+          {
+            "op_id": "81dd1f8073-105d505161",
+            "class": "CritiqueAndRefineConvert",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 4,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.2016,
+            "lcb_q": -0.0754,
+            "ucb_q": 0.4786,
+            "mean_t": 2395.58
+          }
+        ]
+      }
+    },
+    "early_stop_logs": []
+  },
+  "axia-cuad-full-s2-baseline": {
+    "exp": "axia-cuad-full-s2-baseline",
+    "max_rounds": 17,
+    "total_mab_samples_drawn": 103,
+    "ops": {
+      "0-022b755afd": {
+        "rounds": 17,
+        "global_total_samples": 20,
+        "samples_drawn_sum": 20,
+        "explored_ops": 1,
+        "total_ops": 1,
+        "converged": null,
+        "convergence_info": null,
+        "top_ops": [
+          {
+            "op_id": "022b755afd-f987dae6bd",
+            "class": "MarshalAndScanDataOp",
+            "strategy": null,
+            "samples": 20,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 1.0,
+            "lcb_q": 1.0,
+            "ucb_q": 1.0,
+            "mean_t": 0.0
+          }
+        ]
+      },
+      "1-81dd1f8073": {
+        "rounds": 17,
+        "global_total_samples": 103,
+        "samples_drawn_sum": 103,
+        "explored_ops": 6,
+        "total_ops": 6,
+        "converged": null,
+        "convergence_info": null,
+        "top_ops": [
+          {
+            "op_id": "81dd1f8073-28d1f7ecaf",
+            "class": "LLMConvertBonded",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 20,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 0.6248,
+            "lcb_q": 0.526,
+            "ucb_q": 0.7237,
+            "mean_t": 328.79
+          },
+          {
+            "op_id": "81dd1f8073-0bc6edead1",
+            "class": "CritiqueAndRefineConvert",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 20,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.5909,
+            "lcb_q": 0.4921,
+            "ucb_q": 0.6897,
+            "mean_t": 659.94
+          },
+          {
+            "op_id": "81dd1f8073-2bc1fc30e9",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 19,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.5815,
+            "lcb_q": 0.4801,
+            "ucb_q": 0.6828,
+            "mean_t": 320.21
+          },
+          {
+            "op_id": "81dd1f8073-23b8bdc0a5",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 20,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.565,
+            "lcb_q": 0.4662,
+            "ucb_q": 0.6639,
+            "mean_t": 977.19
+          },
+          {
+            "op_id": "81dd1f8073-06bd4f49c7",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 20,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.4789,
+            "lcb_q": 0.3801,
+            "ucb_q": 0.5777,
+            "mean_t": 1174.42
+          },
+          {
+            "op_id": "81dd1f8073-105d505161",
+            "class": "CritiqueAndRefineConvert",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 4,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.2143,
+            "lcb_q": -0.0067,
+            "ucb_q": 0.4353,
+            "mean_t": 1834.05
+          }
+        ]
+      }
+    },
+    "early_stop_logs": []
+  },
+  "axia-biodex-full-s0-baseline": {
+    "exp": "axia-biodex-full-s0-baseline",
+    "f1": null,
+    "precision": null,
+    "recall": null,
+    "rp@5": 0.20460000000000006,
+    "opt_time": 16512.685019493103,
+    "exec_time": 22108.567103385925,
+    "tot_time": 38621.25212287903,
+    "plan_str": "0. Schema['abstract', 'fulltext', 'pmid', 'reaction_labels', 'reactions', 'title'] -> CritiqueAndRefineConvert -> Schema['abstract', 'fulltext', 'pmid', 'ranked_reaction_labels', 'reaction_labels', 'reactions', 'title']\n    (abstract, fulltext, pmid, reac) -> (abstract, fulltext, pmid, rank)\n    Model: Qwen2.5-14B-GPU1\n    Prompt Strategy: PromptStrategy.MAP\n    Reasoning Effort: default\n    Critic Model: Qwen2.5-14B-GPU1\n    Refine Model: Qwen2.5-14B-GPU0\n\n  1. Schema['abstract', 'fulltext', 'pmid', 'reactions', 'title'] -> TopKOp -> Schema['abstract', 'fulltext', 'pmid', 'reaction_labels', 'reactions', 'title']\n    (abstract, fulltext, pmid, reac) -> (abstract, fulltext, pmid, reac)\n    Top-K: Collection with k=20\n\n    2. Schema['abstract', 'fulltext', 'pmid', 'title'] -> CritiqueAndRefineConvert -> Schema['abstract', 'fulltext', 'pmid', 'reactions', 'title']\n    (abstract, fulltext, pmid, titl) -> (abstract, fulltext, pmid, reac)\n    Model: Qwen2.5-14B-GPU1\n    Prompt Strategy: PromptStrategy.MAP\n    Reasoning Effort: default\n    Critic Model: Qwen2.5-14B-GPU1\n    Refine Model: Qwen2.5-14B-GPU0\n\n      3. MarshalAndScanDataOp(Dataset(schema=<class 'palimpzest.core.lib.schemas.Schema['abstract', 'fulltext', 'pmid', 'title']'>, id=biodex, op_id=4bb7f58f1d)) -> <class 'palimpzest.core.lib.schemas.Schema['abstract', 'fulltext', 'pmid', 'title']'>\n    (pmid, title, abstract, fulltex)",
+    "phase1_out_tokens": 432945.0,
+    "phase2_out_tokens": 1494194.0,
+    "total_out_tokens": 1927139.0,
+    "phase1_op_executions": 0,
+    "max_rounds": 14,
+    "total_mab_samples_drawn": 293,
+    "ops": {
+      "0-4bb7f58f1d": {
+        "rounds": 14,
+        "global_total_samples": 17,
+        "samples_drawn_sum": 17,
+        "explored_ops": 1,
+        "total_ops": 1,
+        "converged": null,
+        "convergence_info": null,
+        "top_ops": [
+          {
+            "op_id": "4bb7f58f1d-2341ca6947",
+            "class": "MarshalAndScanDataOp",
+            "strategy": null,
+            "samples": 17,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 1.0,
+            "lcb_q": 1.0,
+            "ucb_q": 1.0,
+            "mean_t": 0.0
+          }
+        ]
+      },
+      "1-2aa5d04bc1": {
+        "rounds": 14,
+        "global_total_samples": 118,
+        "samples_drawn_sum": 118,
+        "explored_ops": 8,
+        "total_ops": 8,
+        "converged": null,
+        "convergence_info": null,
+        "top_ops": [
+          {
+            "op_id": "2aa5d04bc1-105d505161",
+            "class": "CritiqueAndRefineConvert",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 16,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 0.5086,
+            "lcb_q": 0.4263,
+            "ucb_q": 0.5909,
+            "mean_t": 405.92
+          },
+          {
+            "op_id": "2aa5d04bc1-2bc1fc30e9",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 16,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.4982,
+            "lcb_q": 0.4159,
+            "ucb_q": 0.5805,
+            "mean_t": 254.06
+          },
+          {
+            "op_id": "2aa5d04bc1-23b8bdc0a5",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 16,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.496,
+            "lcb_q": 0.4137,
+            "ucb_q": 0.5783,
+            "mean_t": 414.02
+          },
+          {
+            "op_id": "2aa5d04bc1-0bc6edead1",
+            "class": "CritiqueAndRefineConvert",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 16,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.4884,
+            "lcb_q": 0.406,
+            "ucb_q": 0.5707,
+            "mean_t": 463.61
+          },
+          {
+            "op_id": "2aa5d04bc1-2d67f97ebd",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 16,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.4856,
+            "lcb_q": 0.4033,
+            "ucb_q": 0.5679,
+            "mean_t": 251.29
+          },
+          {
+            "op_id": "2aa5d04bc1-28d1f7ecaf",
+            "class": "LLMConvertBonded",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 17,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.4841,
+            "lcb_q": 0.4042,
+            "ucb_q": 0.564,
+            "mean_t": 107.38
+          },
+          {
+            "op_id": "2aa5d04bc1-06bd4f49c7",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 17,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.4807,
+            "lcb_q": 0.4009,
+            "ucb_q": 0.5606,
+            "mean_t": 461.74
+          },
+          {
+            "op_id": "2aa5d04bc1-2c0d6a7069",
+            "class": "LLMConvertBonded",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 4,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.2071,
+            "lcb_q": 0.0425,
+            "ucb_q": 0.3718,
+            "mean_t": 144.15
+          }
+        ]
+      },
+      "2-7991bbf1ca": {
+        "rounds": 14,
+        "global_total_samples": 84,
+        "samples_drawn_sum": 84,
+        "explored_ops": 7,
+        "total_ops": 7,
+        "converged": null,
+        "convergence_info": null,
+        "top_ops": [
+          {
+            "op_id": "7991bbf1ca-69999e193d",
+            "class": "TopKOp",
+            "strategy": null,
+            "samples": 17,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 0.5703,
+            "lcb_q": 0.4248,
+            "ucb_q": 0.7159,
+            "mean_t": 0.06
+          },
+          {
+            "op_id": "7991bbf1ca-936410cac8",
+            "class": "TopKOp",
+            "strategy": null,
+            "samples": 17,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.5098,
+            "lcb_q": 0.3643,
+            "ucb_q": 0.6554,
+            "mean_t": 0.05
+          },
+          {
+            "op_id": "7991bbf1ca-78304785bd",
+            "class": "TopKOp",
+            "strategy": null,
+            "samples": 17,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.4985,
+            "lcb_q": 0.3529,
+            "ucb_q": 0.6441,
+            "mean_t": 0.05
+          },
+          {
+            "op_id": "7991bbf1ca-30c2d46df0",
+            "class": "TopKOp",
+            "strategy": null,
+            "samples": 17,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.4685,
+            "lcb_q": 0.323,
+            "ucb_q": 0.6141,
+            "mean_t": 0.07
+          },
+          {
+            "op_id": "7991bbf1ca-ea953c6cb1",
+            "class": "TopKOp",
+            "strategy": null,
+            "samples": 7,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.1037,
+            "lcb_q": -0.1231,
+            "ucb_q": 0.3306,
+            "mean_t": 0.06
+          },
+          {
+            "op_id": "7991bbf1ca-2e19943c6a",
+            "class": "TopKOp",
+            "strategy": null,
+            "samples": 5,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.0686,
+            "lcb_q": -0.1999,
+            "ucb_q": 0.337,
+            "mean_t": 0.12
+          },
+          {
+            "op_id": "7991bbf1ca-ab40525544",
+            "class": "TopKOp",
+            "strategy": null,
+            "samples": 4,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.0,
+            "lcb_q": -0.3001,
+            "ucb_q": 0.3001,
+            "mean_t": 0.07
+          }
+        ]
+      },
+      "3-7b7b565330": {
+        "rounds": 14,
+        "global_total_samples": 91,
+        "samples_drawn_sum": 91,
+        "explored_ops": 7,
+        "total_ops": 7,
+        "converged": null,
+        "convergence_info": null,
+        "top_ops": [
+          {
+            "op_id": "7b7b565330-105d505161",
+            "class": "CritiqueAndRefineConvert",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 16,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 0.4948,
+            "lcb_q": 0.3634,
+            "ucb_q": 0.6262,
+            "mean_t": 564.54
+          },
+          {
+            "op_id": "7b7b565330-06bd4f49c7",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 16,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.4698,
+            "lcb_q": 0.3384,
+            "ucb_q": 0.6012,
+            "mean_t": 597.93
+          },
+          {
+            "op_id": "7b7b565330-28d1f7ecaf",
+            "class": "LLMConvertBonded",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 17,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.4402,
+            "lcb_q": 0.3128,
+            "ucb_q": 0.5676,
+            "mean_t": 180.79
+          },
+          {
+            "op_id": "7b7b565330-0bc6edead1",
+            "class": "CritiqueAndRefineConvert",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 17,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.4382,
+            "lcb_q": 0.3108,
+            "ucb_q": 0.5657,
+            "mean_t": 591.59
+          },
+          {
+            "op_id": "7b7b565330-23b8bdc0a5",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 17,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.4265,
+            "lcb_q": 0.299,
+            "ucb_q": 0.5539,
+            "mean_t": 516.67
+          },
+          {
+            "op_id": "7b7b565330-2bc1fc30e9",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 4,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.0,
+            "lcb_q": -0.2627,
+            "ucb_q": 0.2627,
+            "mean_t": 94.74
+          },
+          {
+            "op_id": "7b7b565330-2c0d6a7069",
+            "class": "LLMConvertBonded",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 4,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.0,
+            "lcb_q": -0.2627,
+            "ucb_q": 0.2627,
+            "mean_t": 146.85
+          }
+        ]
+      }
+    },
+    "early_stop_logs": []
+  },
+  "axia-biodex-full-s0-es": {
+    "exp": "axia-biodex-full-s0-es",
+    "f1": null,
+    "precision": null,
+    "recall": null,
+    "rp@5": 0.28179999999999994,
+    "opt_time": 4651.063698530197,
+    "exec_time": 26951.640323638916,
+    "tot_time": 31602.704022169113,
+    "plan_str": "0. Schema['abstract', 'fulltext', 'pmid', 'reaction_labels', 'reactions', 'title'] -> MixtureOfAgentsConvert -> Schema['abstract', 'fulltext', 'pmid', 'ranked_reaction_labels', 'reaction_labels', 'reactions', 'title']\n    (abstract, fulltext, pmid, reac) -> (abstract, fulltext, pmid, rank)\n    Prompt Strategy: None\n    Reasoning Effort: default\n    Proposer Models: [Qwen2.5-14B-GPU0, Qwen2.5-14B-GPU1]\n    Temperatures: [0.8, 0.8]\n    Aggregator Model: Qwen2.5-14B-GPU0\n\n  1. Schema['abstract', 'fulltext', 'pmid', 'reactions', 'title'] -> TopKOp -> Schema['abstract', 'fulltext', 'pmid', 'reaction_labels', 'reactions', 'title']\n    (abstract, fulltext, pmid, reac) -> (abstract, fulltext, pmid, reac)\n    Top-K: Collection with k=20\n\n    2. Schema['abstract', 'fulltext', 'pmid', 'title'] -> LLMConvertBonded -> Schema['abstract', 'fulltext', 'pmid', 'reactions', 'title']\n    (abstract, fulltext, pmid, titl) -> (abstract, fulltext, pmid, reac)\n    Model: Qwen2.5-14B-GPU1\n    Prompt Strategy: PromptStrategy.MAP\n    Reasoning Effort: default\n\n      3. MarshalAndScanDataOp(Dataset(schema=<class 'palimpzest.core.lib.schemas.Schema['abstract', 'fulltext', 'pmid', 'title']'>, id=biodex, op_id=4bb7f58f1d)) -> <class 'palimpzest.core.lib.schemas.Schema['abstract', 'fulltext', 'pmid', 'title']'>\n    (pmid, title, abstract, fulltex)",
+    "phase1_out_tokens": 134249.0,
+    "phase2_out_tokens": 851552.0,
+    "total_out_tokens": 985801.0,
+    "phase1_op_executions": 0,
+    "max_rounds": 3,
+    "total_mab_samples_drawn": 105,
+    "ops": {
+      "0-4bb7f58f1d": {
+        "rounds": 3,
+        "global_total_samples": 6,
+        "samples_drawn_sum": 6,
+        "explored_ops": 1,
+        "total_ops": 1,
+        "converged": true,
+        "convergence_info": null,
+        "top_ops": [
+          {
+            "op_id": "4bb7f58f1d-2341ca6947",
+            "class": "MarshalAndScanDataOp",
+            "strategy": null,
+            "samples": 6,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 1.0,
+            "lcb_q": 1.0,
+            "ucb_q": 1.0,
+            "mean_t": 0.0
+          }
+        ]
+      },
+      "1-2aa5d04bc1": {
+        "rounds": 3,
+        "global_total_samples": 33,
+        "samples_drawn_sum": 33,
+        "explored_ops": 6,
+        "total_ops": 6,
+        "converged": true,
+        "convergence_info": {
+          "reason": "futility",
+          "leader": "2aa5d04bc1-28d1f7ecaf",
+          "runner_up": "2aa5d04bc1-06bd4f49c7",
+          "mean_leader": 0.4246031746031746,
+          "mean_runner_up": 0.36190476190476195,
+          "n_leader": 6,
+          "n_runner_up": 6,
+          "sigma": 0.27689479212063584,
+          "z": 1.645,
+          "remaining_budget_share": 70.0,
+          "update": 3
+        },
+        "top_ops": [
+          {
+            "op_id": "2aa5d04bc1-28d1f7ecaf",
+            "class": "LLMConvertBonded",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 6,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 0.4246,
+            "lcb_q": 0.3143,
+            "ucb_q": 0.5349,
+            "mean_t": 113.41
+          },
+          {
+            "op_id": "2aa5d04bc1-06bd4f49c7",
+            "class": null,
+            "strategy": null,
+            "samples": 6,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.3619,
+            "lcb_q": 0.2516,
+            "ucb_q": 0.4722,
+            "mean_t": 493.77
+          },
+          {
+            "op_id": "2aa5d04bc1-0bc6edead1",
+            "class": null,
+            "strategy": null,
+            "samples": 6,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.3619,
+            "lcb_q": 0.2516,
+            "ucb_q": 0.4722,
+            "mean_t": 469.49
+          },
+          {
+            "op_id": "2aa5d04bc1-23b8bdc0a5",
+            "class": null,
+            "strategy": null,
+            "samples": 6,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.3619,
+            "lcb_q": 0.2516,
+            "ucb_q": 0.4722,
+            "mean_t": 458.51
+          },
+          {
+            "op_id": "2aa5d04bc1-2bc1fc30e9",
+            "class": null,
+            "strategy": null,
+            "samples": 5,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.3095,
+            "lcb_q": 0.1887,
+            "ucb_q": 0.4303,
+            "mean_t": 263.85
+          },
+          {
+            "op_id": "2aa5d04bc1-105d505161",
+            "class": "CritiqueAndRefineConvert",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 4,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.1357,
+            "lcb_q": 0.0007,
+            "ucb_q": 0.2708,
+            "mean_t": 483.05
+          }
+        ]
+      },
+      "2-7991bbf1ca": {
+        "rounds": 3,
+        "global_total_samples": 33,
+        "samples_drawn_sum": 33,
+        "explored_ops": 6,
+        "total_ops": 6,
+        "converged": true,
+        "convergence_info": {
+          "reason": "futility",
+          "leader": "7991bbf1ca-69999e193d",
+          "runner_up": "7991bbf1ca-936410cac8",
+          "mean_leader": 0.4158730158730159,
+          "mean_runner_up": 0.4158730158730159,
+          "n_leader": 6,
+          "n_runner_up": 6,
+          "sigma": 0.28652662296710624,
+          "z": 1.645,
+          "remaining_budget_share": 70.0,
+          "update": 3
+        },
+        "top_ops": [
+          {
+            "op_id": "7991bbf1ca-69999e193d",
+            "class": "TopKOp",
+            "strategy": null,
+            "samples": 6,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 0.4159,
+            "lcb_q": 0.2571,
+            "ucb_q": 0.5746,
+            "mean_t": 0.07
+          },
+          {
+            "op_id": "7991bbf1ca-936410cac8",
+            "class": null,
+            "strategy": null,
+            "samples": 6,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 0.4159,
+            "lcb_q": 0.2571,
+            "ucb_q": 0.5746,
+            "mean_t": 0.05
+          },
+          {
+            "op_id": "7991bbf1ca-78304785bd",
+            "class": null,
+            "strategy": null,
+            "samples": 6,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.3881,
+            "lcb_q": 0.2294,
+            "ucb_q": 0.5468,
+            "mean_t": 0.06
+          },
+          {
+            "op_id": "7991bbf1ca-30c2d46df0",
+            "class": null,
+            "strategy": null,
+            "samples": 6,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.3492,
+            "lcb_q": 0.1905,
+            "ucb_q": 0.5079,
+            "mean_t": 0.11
+          },
+          {
+            "op_id": "7991bbf1ca-2e19943c6a",
+            "class": null,
+            "strategy": null,
+            "samples": 5,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.1071,
+            "lcb_q": -0.0667,
+            "ucb_q": 0.281,
+            "mean_t": 0.12
+          },
+          {
+            "op_id": "7991bbf1ca-ab40525544",
+            "class": "TopKOp",
+            "strategy": null,
+            "samples": 4,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.0,
+            "lcb_q": -0.1944,
+            "ucb_q": 0.1944,
+            "mean_t": 0.07
+          }
+        ]
+      },
+      "3-7b7b565330": {
+        "rounds": 3,
+        "global_total_samples": 39,
+        "samples_drawn_sum": 39,
+        "explored_ops": 8,
+        "total_ops": 8,
+        "converged": true,
+        "convergence_info": {
+          "reason": "futility",
+          "leader": "7b7b565330-06bd4f49c7",
+          "runner_up": "7b7b565330-105d505161",
+          "mean_leader": 0.38611111111111107,
+          "mean_runner_up": 0.3416666666666666,
+          "n_leader": 6,
+          "n_runner_up": 6,
+          "sigma": 0.22619521918114496,
+          "z": 1.645,
+          "remaining_budget_share": 70.0,
+          "update": 3
+        },
+        "top_ops": [
+          {
+            "op_id": "7b7b565330-06bd4f49c7",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 6,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 0.3861,
+            "lcb_q": 0.2353,
+            "ucb_q": 0.537,
+            "mean_t": 602.27
+          },
+          {
+            "op_id": "7b7b565330-105d505161",
+            "class": null,
+            "strategy": null,
+            "samples": 6,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.3417,
+            "lcb_q": 0.1908,
+            "ucb_q": 0.4925,
+            "mean_t": 584.35
+          },
+          {
+            "op_id": "7b7b565330-0bc6edead1",
+            "class": null,
+            "strategy": null,
+            "samples": 5,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.16,
+            "lcb_q": -0.0053,
+            "ucb_q": 0.3253,
+            "mean_t": 628.15
+          },
+          {
+            "op_id": "7b7b565330-23b8bdc0a5",
+            "class": null,
+            "strategy": null,
+            "samples": 5,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.16,
+            "lcb_q": -0.0053,
+            "ucb_q": 0.3253,
+            "mean_t": 512.09
+          },
+          {
+            "op_id": "7b7b565330-28d1f7ecaf",
+            "class": null,
+            "strategy": null,
+            "samples": 5,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.16,
+            "lcb_q": -0.0053,
+            "ucb_q": 0.3253,
+            "mean_t": 157.84
+          },
+          {
+            "op_id": "7b7b565330-2bc1fc30e9",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 4,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.0,
+            "lcb_q": -0.1848,
+            "ucb_q": 0.1848,
+            "mean_t": 90.0
+          },
+          {
+            "op_id": "7b7b565330-2c0d6a7069",
+            "class": "LLMConvertBonded",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 4,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.0,
+            "lcb_q": -0.1848,
+            "ucb_q": 0.1848,
+            "mean_t": 265.11
+          },
+          {
+            "op_id": "7b7b565330-2d67f97ebd",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 4,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.0,
+            "lcb_q": -0.1848,
+            "ucb_q": 0.1848,
+            "mean_t": 74.88
+          }
+        ]
+      }
+    },
+    "early_stop_logs": []
+  },
+  "axia-biodex-full-s1-baseline": {
+    "exp": "axia-biodex-full-s1-baseline",
+    "max_rounds": 14,
+    "total_mab_samples_drawn": 269,
+    "ops": {
+      "0-4bb7f58f1d": {
+        "rounds": 14,
+        "global_total_samples": 17,
+        "samples_drawn_sum": 17,
+        "explored_ops": 1,
+        "total_ops": 1,
+        "converged": null,
+        "convergence_info": null,
+        "top_ops": [
+          {
+            "op_id": "4bb7f58f1d-2341ca6947",
+            "class": "MarshalAndScanDataOp",
+            "strategy": null,
+            "samples": 17,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 1.0,
+            "lcb_q": 1.0,
+            "ucb_q": 1.0,
+            "mean_t": 0.0
+          }
+        ]
+      },
+      "1-2aa5d04bc1": {
+        "rounds": 14,
+        "global_total_samples": 100,
+        "samples_drawn_sum": 100,
+        "explored_ops": 8,
+        "total_ops": 8,
+        "converged": null,
+        "convergence_info": null,
+        "top_ops": [
+          {
+            "op_id": "2aa5d04bc1-28d1f7ecaf",
+            "class": "LLMConvertBonded",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 17,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 0.398,
+            "lcb_q": 0.3703,
+            "ucb_q": 0.4256,
+            "mean_t": 100.33
+          },
+          {
+            "op_id": "2aa5d04bc1-06bd4f49c7",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 17,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.3903,
+            "lcb_q": 0.3626,
+            "ucb_q": 0.418,
+            "mean_t": 489.82
+          },
+          {
+            "op_id": "2aa5d04bc1-2d67f97ebd",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 6,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.3887,
+            "lcb_q": 0.3422,
+            "ucb_q": 0.4353,
+            "mean_t": 227.47
+          },
+          {
+            "op_id": "2aa5d04bc1-0bc6edead1",
+            "class": "CritiqueAndRefineConvert",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 17,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.3762,
+            "lcb_q": 0.3485,
+            "ucb_q": 0.4039,
+            "mean_t": 449.35
+          },
+          {
+            "op_id": "2aa5d04bc1-2bc1fc30e9",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 12,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.3543,
+            "lcb_q": 0.3213,
+            "ucb_q": 0.3872,
+            "mean_t": 281.16
+          },
+          {
+            "op_id": "2aa5d04bc1-23b8bdc0a5",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 13,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.3256,
+            "lcb_q": 0.294,
+            "ucb_q": 0.3573,
+            "mean_t": 427.66
+          },
+          {
+            "op_id": "2aa5d04bc1-105d505161",
+            "class": "CritiqueAndRefineConvert",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 14,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.3106,
+            "lcb_q": 0.2801,
+            "ucb_q": 0.3411,
+            "mean_t": 422.53
+          },
+          {
+            "op_id": "2aa5d04bc1-2c0d6a7069",
+            "class": "LLMConvertBonded",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 4,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.2917,
+            "lcb_q": 0.2346,
+            "ucb_q": 0.3487,
+            "mean_t": 103.74
+          }
+        ]
+      },
+      "2-7991bbf1ca": {
+        "rounds": 14,
+        "global_total_samples": 81,
+        "samples_drawn_sum": 81,
+        "explored_ops": 7,
+        "total_ops": 7,
+        "converged": null,
+        "convergence_info": null,
+        "top_ops": [
+          {
+            "op_id": "7991bbf1ca-69999e193d",
+            "class": "TopKOp",
+            "strategy": null,
+            "samples": 17,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 0.4836,
+            "lcb_q": 0.3735,
+            "ucb_q": 0.5937,
+            "mean_t": 0.07
+          },
+          {
+            "op_id": "7991bbf1ca-936410cac8",
+            "class": "TopKOp",
+            "strategy": null,
+            "samples": 17,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.4128,
+            "lcb_q": 0.3027,
+            "ucb_q": 0.5229,
+            "mean_t": 0.06
+          },
+          {
+            "op_id": "7991bbf1ca-78304785bd",
+            "class": "TopKOp",
+            "strategy": null,
+            "samples": 17,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.4007,
+            "lcb_q": 0.2906,
+            "ucb_q": 0.5108,
+            "mean_t": 0.06
+          },
+          {
+            "op_id": "7991bbf1ca-30c2d46df0",
+            "class": "TopKOp",
+            "strategy": null,
+            "samples": 17,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.3302,
+            "lcb_q": 0.2201,
+            "ucb_q": 0.4403,
+            "mean_t": 0.08
+          },
+          {
+            "op_id": "7991bbf1ca-ea953c6cb1",
+            "class": "TopKOp",
+            "strategy": null,
+            "samples": 5,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.1495,
+            "lcb_q": -0.0535,
+            "ucb_q": 0.3525,
+            "mean_t": 0.07
+          },
+          {
+            "op_id": "7991bbf1ca-2e19943c6a",
+            "class": "TopKOp",
+            "strategy": null,
+            "samples": 4,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.101,
+            "lcb_q": -0.126,
+            "ucb_q": 0.328,
+            "mean_t": 0.12
+          },
+          {
+            "op_id": "7991bbf1ca-ab40525544",
+            "class": "TopKOp",
+            "strategy": null,
+            "samples": 4,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.0505,
+            "lcb_q": -0.1765,
+            "ucb_q": 0.2775,
+            "mean_t": 0.08
+          }
+        ]
+      },
+      "3-7b7b565330": {
+        "rounds": 14,
+        "global_total_samples": 88,
+        "samples_drawn_sum": 88,
+        "explored_ops": 6,
+        "total_ops": 6,
+        "converged": null,
+        "convergence_info": null,
+        "top_ops": [
+          {
+            "op_id": "7b7b565330-0bc6edead1",
+            "class": "CritiqueAndRefineConvert",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 17,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 0.3824,
+            "lcb_q": 0.3099,
+            "ucb_q": 0.4548,
+            "mean_t": 654.09
+          },
+          {
+            "op_id": "7b7b565330-06bd4f49c7",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 17,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.3559,
+            "lcb_q": 0.2834,
+            "ucb_q": 0.4283,
+            "mean_t": 738.69
+          },
+          {
+            "op_id": "7b7b565330-28d1f7ecaf",
+            "class": "LLMConvertBonded",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 17,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.3412,
+            "lcb_q": 0.2687,
+            "ucb_q": 0.4136,
+            "mean_t": 160.79
+          },
+          {
+            "op_id": "7b7b565330-105d505161",
+            "class": "CritiqueAndRefineConvert",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 17,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.2882,
+            "lcb_q": 0.2158,
+            "ucb_q": 0.3607,
+            "mean_t": 632.74
+          },
+          {
+            "op_id": "7b7b565330-23b8bdc0a5",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 16,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.2844,
+            "lcb_q": 0.2097,
+            "ucb_q": 0.3591,
+            "mean_t": 649.26
+          },
+          {
+            "op_id": "7b7b565330-2bc1fc30e9",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 4,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.1,
+            "lcb_q": -0.0494,
+            "ucb_q": 0.2494,
+            "mean_t": 65.01
+          }
+        ]
+      }
+    },
+    "early_stop_logs": []
+  },
+  "axia-biodex-full-s1-es": {
+    "exp": "axia-biodex-full-s1-es",
+    "max_rounds": 7,
+    "total_mab_samples_drawn": 133,
+    "ops": {
+      "0-4bb7f58f1d": {
+        "rounds": 7,
+        "global_total_samples": 10,
+        "samples_drawn_sum": 10,
+        "explored_ops": 1,
+        "total_ops": 1,
+        "converged": true,
+        "convergence_info": null,
+        "top_ops": [
+          {
+            "op_id": "4bb7f58f1d-2341ca6947",
+            "class": "MarshalAndScanDataOp",
+            "strategy": null,
+            "samples": 10,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 1.0,
+            "lcb_q": 1.0,
+            "ucb_q": 1.0,
+            "mean_t": 0.0
+          }
+        ]
+      },
+      "1-2aa5d04bc1": {
+        "rounds": 7,
+        "global_total_samples": 37,
+        "samples_drawn_sum": 37,
+        "explored_ops": 6,
+        "total_ops": 6,
+        "converged": true,
+        "convergence_info": {
+          "reason": "futility",
+          "leader": "2aa5d04bc1-06bd4f49c7",
+          "runner_up": "2aa5d04bc1-0bc6edead1",
+          "mean_leader": 0.4296296296296296,
+          "mean_runner_up": 0.42693602693602695,
+          "n_leader": 6,
+          "n_runner_up": 6,
+          "sigma": 0.24462814866527421,
+          "z": 1.645,
+          "remaining_budget_share": 72.0,
+          "update": 3
+        },
+        "top_ops": [
+          {
+            "op_id": "2aa5d04bc1-0bc6edead1",
+            "class": "CritiqueAndRefineConvert",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 6,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 0.4269,
+            "lcb_q": 0.3593,
+            "ucb_q": 0.4946,
+            "mean_t": 394.41
+          },
+          {
+            "op_id": "2aa5d04bc1-06bd4f49c7",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 10,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.4201,
+            "lcb_q": 0.3677,
+            "ucb_q": 0.4725,
+            "mean_t": 343.78
+          },
+          {
+            "op_id": "2aa5d04bc1-28d1f7ecaf",
+            "class": "LLMConvertBonded",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 6,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.4153,
+            "lcb_q": 0.3477,
+            "ucb_q": 0.483,
+            "mean_t": 103.24
+          },
+          {
+            "op_id": "2aa5d04bc1-23b8bdc0a5",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 6,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.4109,
+            "lcb_q": 0.3433,
+            "ucb_q": 0.4786,
+            "mean_t": 395.61
+          },
+          {
+            "op_id": "2aa5d04bc1-2bc1fc30e9",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 5,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.3925,
+            "lcb_q": 0.3184,
+            "ucb_q": 0.4666,
+            "mean_t": 190.93
+          },
+          {
+            "op_id": "2aa5d04bc1-105d505161",
+            "class": "CritiqueAndRefineConvert",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 4,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.2525,
+            "lcb_q": 0.1697,
+            "ucb_q": 0.3354,
+            "mean_t": 452.12
+          }
+        ]
+      },
+      "2-7991bbf1ca": {
+        "rounds": 7,
+        "global_total_samples": 54,
+        "samples_drawn_sum": 54,
+        "explored_ops": 7,
+        "total_ops": 7,
+        "converged": true,
+        "convergence_info": {
+          "reason": "futility",
+          "leader": "7991bbf1ca-69999e193d",
+          "runner_up": "7991bbf1ca-936410cac8",
+          "mean_leader": 0.3898840048840048,
+          "mean_runner_up": 0.3293284493284493,
+          "n_leader": 10,
+          "n_runner_up": 10,
+          "sigma": 0.19820081270526155,
+          "z": 1.645,
+          "remaining_budget_share": 166.0,
+          "update": 7
+        },
+        "top_ops": [
+          {
+            "op_id": "7991bbf1ca-69999e193d",
+            "class": "TopKOp",
+            "strategy": null,
+            "samples": 10,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 0.3899,
+            "lcb_q": 0.2827,
+            "ucb_q": 0.4971,
+            "mean_t": 0.05
+          },
+          {
+            "op_id": "7991bbf1ca-936410cac8",
+            "class": null,
+            "strategy": null,
+            "samples": 10,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.3293,
+            "lcb_q": 0.2222,
+            "ucb_q": 0.4365,
+            "mean_t": 0.05
+          },
+          {
+            "op_id": "7991bbf1ca-78304785bd",
+            "class": null,
+            "strategy": null,
+            "samples": 10,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.3005,
+            "lcb_q": 0.1934,
+            "ucb_q": 0.4077,
+            "mean_t": 0.05
+          },
+          {
+            "op_id": "7991bbf1ca-30c2d46df0",
+            "class": null,
+            "strategy": null,
+            "samples": 10,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.2808,
+            "lcb_q": 0.1737,
+            "ucb_q": 0.388,
+            "mean_t": 0.08
+          },
+          {
+            "op_id": "7991bbf1ca-ea953c6cb1",
+            "class": "TopKOp",
+            "strategy": null,
+            "samples": 6,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.1246,
+            "lcb_q": -0.0138,
+            "ucb_q": 0.2629,
+            "mean_t": 0.07
+          },
+          {
+            "op_id": "7991bbf1ca-2e19943c6a",
+            "class": "TopKOp",
+            "strategy": null,
+            "samples": 4,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.101,
+            "lcb_q": -0.0684,
+            "ucb_q": 0.2705,
+            "mean_t": 0.14
+          },
+          {
+            "op_id": "7991bbf1ca-ab40525544",
+            "class": "TopKOp",
+            "strategy": null,
+            "samples": 4,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.0505,
+            "lcb_q": -0.119,
+            "ucb_q": 0.22,
+            "mean_t": 0.07
+          }
+        ]
+      },
+      "3-7b7b565330": {
+        "rounds": 7,
+        "global_total_samples": 42,
+        "samples_drawn_sum": 42,
+        "explored_ops": 7,
+        "total_ops": 7,
+        "converged": true,
+        "convergence_info": {
+          "reason": "futility",
+          "leader": "7b7b565330-06bd4f49c7",
+          "runner_up": "7b7b565330-2c0d6a7069",
+          "mean_leader": 0.35000000000000003,
+          "mean_runner_up": 0.33999999999999997,
+          "n_leader": 6,
+          "n_runner_up": 5,
+          "sigma": 0.25689924527374974,
+          "z": 1.645,
+          "remaining_budget_share": 72.0,
+          "update": 3
+        },
+        "top_ops": [
+          {
+            "op_id": "7b7b565330-0bc6edead1",
+            "class": "CritiqueAndRefineConvert",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 6,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 0.3083,
+            "lcb_q": 0.2261,
+            "ucb_q": 0.3905,
+            "mean_t": 526.25
+          },
+          {
+            "op_id": "7b7b565330-28d1f7ecaf",
+            "class": "LLMConvertBonded",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 6,
+            "status": "PARETO_OPTIMAL",
+            "prune_reason": null,
+            "mean_q": 0.3083,
+            "lcb_q": 0.2261,
+            "ucb_q": 0.3905,
+            "mean_t": 180.64
+          },
+          {
+            "op_id": "7b7b565330-06bd4f49c7",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 10,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.295,
+            "lcb_q": 0.2313,
+            "ucb_q": 0.3587,
+            "mean_t": 410.84
+          },
+          {
+            "op_id": "7b7b565330-2c0d6a7069",
+            "class": "LLMConvertBonded",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 6,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.2833,
+            "lcb_q": 0.2011,
+            "ucb_q": 0.3655,
+            "mean_t": 249.79
+          },
+          {
+            "op_id": "7b7b565330-23b8bdc0a5",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 6,
+            "status": "ACTIVE_FRONTIER",
+            "prune_reason": null,
+            "mean_q": 0.275,
+            "lcb_q": 0.1928,
+            "ucb_q": 0.3572,
+            "mean_t": 494.21
+          },
+          {
+            "op_id": "7b7b565330-105d505161",
+            "class": "CritiqueAndRefineConvert",
+            "strategy": "PromptStrategy.MAP",
+            "samples": 4,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.1,
+            "lcb_q": -0.0007,
+            "ucb_q": 0.2007,
+            "mean_t": 746.26
+          },
+          {
+            "op_id": "7b7b565330-2bc1fc30e9",
+            "class": "MixtureOfAgentsConvert",
+            "strategy": "None",
+            "samples": 4,
+            "status": "RETIRED",
+            "prune_reason": "DOMINATED_BY_PARETO",
+            "mean_q": 0.1,
+            "lcb_q": -0.0007,
+            "ucb_q": 0.2007,
+            "mean_t": 86.64
+          }
+        ]
+      }
+    },
+    "early_stop_logs": []
+  }
+}

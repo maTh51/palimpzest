@@ -125,7 +125,7 @@ class MixtureOfAgentsConvert(LLMConvert):
         field_answers, _, aggregator_gen_stats, _ = self.aggregator_generator(candidate, fields, **gen_kwargs)
 
         # compute the total generation stats
-        generation_stats = sum(proposer_model_generation_stats) + aggregator_gen_stats
+        generation_stats = sum([s for s in proposer_model_generation_stats if s is not None], GenerationStats()) + (aggregator_gen_stats or GenerationStats())
 
         return field_answers, generation_stats
 
@@ -243,6 +243,6 @@ class MixtureOfAgentsFilter(LLMFilter):
         field_answers, _, aggregator_gen_stats, _ = self.aggregator_generator(candidate, fields, **gen_kwargs)
 
         # compute the total generation stats
-        generation_stats = sum(proposer_model_generation_stats) + aggregator_gen_stats
+        generation_stats = sum([s for s in proposer_model_generation_stats if s is not None], GenerationStats()) + (aggregator_gen_stats or GenerationStats())
 
         return field_answers, generation_stats

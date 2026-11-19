@@ -83,6 +83,40 @@ class OpFrontier:
         self.reservoir_ops = [op_set[sample_idx] for sample_idx in sample_op_indices[self.k:]]
         self.off_frontier_ops: list[PhysicalOperator] = []
 
+        # Relative-quality pruning (disabled when QUALITY_PRUNE_RHO <= 0, the default).
+        # An op is permanently retired once it has >= QUALITY_PRUNE_MIN_SAMPLES samples and
+        #     mean_quality(op) < rho * max_peer mean_quality
+        # Empirical basis (morfeu 0s/dyn/30s runs): ops that ended PARETO_OPTIMAL never fell
+        # below 0.85x of the best peer's mean quality after 4 samples; rho=0.5 keeps that margin
+        # while catching the ops that otherwise get re-admitted via UCB optimism and wasted
+        # ~20-28% of heavy-operator sample time without ever reaching the frontier.
+        self.quality_prune_rho = float(os.getenv("QUALITY_PRUNE_RHO", "0") or 0)
+        self.quality_prune_min_samples = int(os.getenv("QUALITY_PRUNE_MIN_SAMPLES", "4") or 4)
+        self.quality_pruned_full_op_ids: set[str] = set()
+
+        # Early termination (disabled unless EARLY_STOP=1). Sequential-testing style rule,
+        # calibrated offline in morfeu/analyze_early_stop_futility.py:
+        #   L = leader, R = runner-up (ops with >= ES_N_MIN samples), sigma = pooled per-sample std
+        #   EFFICACY: mean_L - mean_R >= z*sigma*sqrt(1/n_L + 1/n_R)          (winner resolved)
+        #   FUTILITY: mean_L - mean_R <  z*sigma*sqrt(1/(n_L+a) + 1/(n_R+a))  (can't be resolved
+        #             with the remaining budget; a = remaining_budget / #contenders)
+        # Once converged, this frontier only runs its leader (still feeding downstream ops), and
+        # the sentinel loop stops when every multi-operator frontier has converged.
+        self.num_physical_ops = len(op_set)
+        self.es_enabled = os.getenv("EARLY_STOP", "0") == "1"
+        self.es_mode = (os.getenv("ES_MODE", "both") or "both").strip().lower()
+        self.es_sigma_mode = (os.getenv("ES_SIGMA_MODE", "paired") or "paired").strip().lower()
+        self.es_z = float(os.getenv("ES_Z", "1.645") or 1.645)
+        self.es_min_updates = int(os.getenv("ES_MIN_UPDATES", "1") or 1)
+        self.es_n_min = int(os.getenv("ES_N_MIN", "4") or 4)
+        self.es_futility_gamma = float(os.getenv("ES_FUTILITY_GAMMA", "0.5") or 0.5)
+        self.es_remaining_budget: float = float("inf")
+        self.num_updates = 0
+        self.converged = self.num_physical_ops <= 1
+        self.convergence_info: dict | None = None
+        self.last_es_diagnostics: dict | None = None
+        self.leader_full_op_id: str | None = None
+
         # keep track of the source indices processed by each physical operator
         self.full_op_id_to_sources_processed = {op.get_full_op_id(): set() for op in op_set}
         self.full_op_id_to_sources_not_processed = {op.get_full_op_id(): source_indices for op in op_set}
@@ -369,6 +403,156 @@ class OpFrontier:
 
         return op_inputs
 
+    def _compute_es_diagnostics(self, op_metrics: dict, full_op_id_to_record_op_stats: dict, full_op_id_to_num_samples: dict) -> dict:
+        """Compute sequential-testing diagnostics (gap, SE_current, SE_future, zone) on every update."""
+        eligible = [o for o in op_metrics if full_op_id_to_num_samples.get(o, 0) >= self.es_n_min]
+        diag = {
+            "update": self.num_updates,
+            "es_mode": self.es_mode,
+            "es_sigma_mode": self.es_sigma_mode,
+            "es_min_updates": self.es_min_updates,
+            "es_n_min": self.es_n_min,
+            "es_futility_gamma": self.es_futility_gamma,
+            "eligible_count": len(eligible),
+            "remaining_budget_share": None if not np.isfinite(self.es_remaining_budget) else float(self.es_remaining_budget),
+        }
+        if len(eligible) < 2:
+            diag["zone"] = "warmup_ineligible"
+            return diag
+        # 1. Unpaired pooled per-sample quality standard deviation across documents
+        ss_unp, dof_unp = 0.0, 0
+        op_doc_q: dict[str, dict] = {}
+        doc_to_vals: dict = {}
+        for o in eligible:
+            q_list = []
+            dmap = {}
+            for r in full_op_id_to_record_op_stats[o]:
+                if r.quality is None:
+                    continue
+                q_val = float(r.quality)
+                q_list.append(q_val)
+                src_idx = getattr(r, "record_source_indices", None)
+                dkey = tuple(src_idx) if isinstance(src_idx, (list, tuple)) and len(src_idx) > 0 else getattr(r, "record_id", len(q_list))
+                dmap[dkey] = q_val
+                doc_to_vals.setdefault(dkey, []).append(q_val)
+            op_doc_q[o] = dmap
+            if len(q_list) > 1:
+                ss_unp += float(np.var(q_list, ddof=1)) * (len(q_list) - 1)
+                dof_unp += len(q_list) - 1
+        if dof_unp == 0:
+            diag["zone"] = "warmup_zero_dof"
+            return diag
+        sigma_unpaired = float(np.sqrt(ss_unp / dof_unp)) if ss_unp > 0 else 0.0
+
+        # 2. Paired / Within-Document standard deviation (removes between-document difficulty variance beta_d)
+        doc_means = {d: float(np.mean(vs)) for d, vs in doc_to_vals.items() if len(vs) >= 2}
+        ss_within, dof_within = 0.0, 0
+        for o in eligible:
+            centered = [q_val - doc_means[d] for d, q_val in op_doc_q[o].items() if d in doc_means]
+            if len(centered) > 1:
+                op_adv = float(np.mean(centered))
+                ss_within += sum((c - op_adv) ** 2 for c in centered)
+        num_shared_docs = len(doc_means)
+        total_shared_obs = sum(len( vs ) for d, vs in doc_to_vals.items() if len(vs) >= 2)
+        dof_within = max(total_shared_obs - num_shared_docs - (len(eligible) - 1), 0)
+        if dof_within > 0 and ss_within >= 0:
+            sigma_paired = float(np.sqrt(ss_within / dof_within))
+        else:
+            sigma_paired = sigma_unpaired
+
+        ranked = sorted(eligible, key=lambda o: -op_metrics[o]["mean"][2])
+        L, R = ranked[0], ranked[1]
+        # Also compute direct pairwise difference std on documents shared by L and R
+        shared_lr = [op_doc_q[L][d] - op_doc_q[R][d] for d in op_doc_q[L] if d in op_doc_q[R]]
+        if len(shared_lr) >= 2:
+            sigma_lr = float(np.sqrt(0.5 * float(np.var(shared_lr, ddof=1))))
+            if dof_within > 0:
+                sigma_paired = 0.5 * (sigma_paired + sigma_lr)
+            else:
+                sigma_paired = sigma_lr
+
+        sigma = sigma_paired if self.es_sigma_mode == "paired" else sigma_unpaired
+        z = self.es_z
+        mL, nL = float(op_metrics[L]["mean"][2]), int(full_op_id_to_num_samples[L])
+        mR, nR = float(op_metrics[R]["mean"][2]), int(full_op_id_to_num_samples[R])
+        gap = mL - mR
+        se_curr = float(z * sigma * np.sqrt(1.0 / nL + 1.0 / nR))
+        lcb_L = mL - z * sigma / np.sqrt(nL)
+        contenders = sum(
+            1 for o in eligible
+            if op_metrics[o]["mean"][2] + z * sigma / np.sqrt(full_op_id_to_num_samples[o]) >= lcb_L
+        )
+        rem = self.es_remaining_budget if np.isfinite(self.es_remaining_budget) and self.es_remaining_budget > 0 else 0.0
+        add = rem / max(contenders, 1)
+        max_n = max(int(getattr(self, "max_inputs", 20) or 20), nL, nR)
+        fut_nL = min(max_n, nL + add) if add > 0 else nL
+        fut_nR = min(max_n, nR + add) if add > 0 else nR
+        se_fut_raw = float(z * sigma * np.sqrt(1.0 / max(fut_nL, 1.0) + 1.0 / max(fut_nR, 1.0)))
+        se_fut = float(self.es_futility_gamma * se_fut_raw)
+        if sigma == 0.0:
+            raw_zone = "efficacy" if gap > 0 else "futility"
+        elif gap >= se_curr:
+            raw_zone = "efficacy"
+        elif gap < se_fut:
+            raw_zone = "futility"
+        else:
+            raw_zone = "gray_zone"
+        diag.update({
+            "leader": L, "runner_up": R,
+            "mean_leader": mL, "mean_runner_up": mR, "gap": gap,
+            "n_leader": nL, "n_runner_up": nR,
+            "sigma": sigma, "sigma_paired": sigma_paired, "sigma_unpaired": sigma_unpaired,
+            "shared_docs_lr": len(shared_lr),
+            "z": z,
+            "se_current": se_curr, "se_future": se_fut, "se_future_raw": se_fut_raw,
+            "contenders": int(contenders),
+            "zone": "warmup_min_updates" if self.num_updates < self.es_min_updates else raw_zone,
+            "raw_zone": raw_zone,
+        })
+        return diag
+
+    def _check_convergence(self, op_metrics: dict, full_op_id_to_record_op_stats: dict, full_op_id_to_num_samples: dict, unique_logical_op_id: str) -> None:
+        """Efficacy / futility early-termination test (see __init__). Sets self.converged."""
+        diag = self.last_es_diagnostics or self._compute_es_diagnostics(op_metrics, full_op_id_to_record_op_stats, full_op_id_to_num_samples)
+        if self.num_updates < self.es_min_updates or diag.get("eligible_count", 0) < 2 or "sigma" not in diag:
+            return
+        raw_zone = diag.get("raw_zone")
+        reason = None
+        if self.es_mode in ("both", "efficacy") and raw_zone == "efficacy":
+            reason = "efficacy"
+        elif self.es_mode in ("both", "futility") and raw_zone == "futility":
+            reason = "futility"
+        elif self.es_mode == "efficacy" and diag.get("contenders", 2) <= 1:
+            reason = "efficacy"
+        if reason is not None:
+            self.converged = True
+            self.leader_full_op_id = diag["leader"]
+            self.convergence_info = {
+                "reason": reason,
+                "es_mode": self.es_mode,
+                "es_sigma_mode": self.es_sigma_mode,
+                "leader": diag["leader"],
+                "runner_up": diag["runner_up"],
+                "mean_leader": diag["mean_leader"],
+                "mean_runner_up": diag["mean_runner_up"],
+                "gap": diag["gap"],
+                "n_leader": diag["n_leader"],
+                "n_runner_up": diag["n_runner_up"],
+                "sigma": diag["sigma"],
+                "sigma_paired": diag.get("sigma_paired"),
+                "sigma_unpaired": diag.get("sigma_unpaired"),
+                "shared_docs_lr": diag.get("shared_docs_lr"),
+                "z": diag["z"],
+                "se_current": diag["se_current"],
+                "se_future": diag["se_future"],
+                "contenders": diag["contenders"],
+                "remaining_budget_share": diag["remaining_budget_share"],
+                "update": self.num_updates,
+            }
+            msg = f"[early-stop] {unique_logical_op_id} converged ({reason}): {self.convergence_info}"
+            logger.info(msg)
+            print(msg, flush=True)
+
     def update_frontier(self, unique_logical_op_id: str, plan_stats: SentinelPlanStats, full_op_id_to_source_indices_processed: dict[str, set[list]]) -> None:
         """
         Update the set of frontier operators, pulling in new ones from the reservoir as needed.
@@ -520,7 +704,12 @@ class OpFrontier:
 
         # iterate over op metrics and compute the new frontier set of operators
         new_frontier_full_op_ids = set()
+        best_mean_quality = max(m["mean"][2] for m in op_metrics.values())
         for full_op_id, metrics in op_metrics.items():
+
+            # permanently retired by relative-quality pruning: never re-admit
+            if full_op_id in self.quality_pruned_full_op_ids:
+                continue
 
             # if this op is fully sampled, do not keep it on the frontier
             if len(self.full_op_id_to_sources_processed[full_op_id]) == self.max_inputs:
@@ -529,6 +718,22 @@ class OpFrontier:
             # if this op is pareto optimal keep it in our frontier ops
             if full_op_id in pareto_op_set:
                 new_frontier_full_op_ids.add(full_op_id)
+                continue
+
+            # relative-quality pruning (see __init__ for the empirical justification of rho)
+            if (
+                self.quality_prune_rho > 0
+                and policy_dict["quality"] != 0.0
+                and best_mean_quality > 0
+                and full_op_id_to_num_samples[full_op_id] >= self.quality_prune_min_samples
+                and metrics["mean"][2] < self.quality_prune_rho * best_mean_quality
+            ):
+                self.quality_pruned_full_op_ids.add(full_op_id)
+                logger.info(
+                    f"[quality-prune] retiring {full_op_id}: mean_q={metrics['mean'][2]:.3f} < "
+                    f"{self.quality_prune_rho} * best={best_mean_quality:.3f} "
+                    f"(n={full_op_id_to_num_samples[full_op_id]})"
+                )
                 continue
 
             # if this operator timed out / failed (mean quality 0.0), do not keep it on the frontier via UCB optimism
@@ -581,8 +786,31 @@ class OpFrontier:
             new_op = self.reservoir_ops.pop(0)
             new_frontier_ops.append(new_op)
 
+        # ===== EARLY TERMINATION (efficacy / futility) =====
+        self.num_updates += 1
+        if policy_dict["quality"] != 0.0 and self.num_physical_ops > 1:
+            self.last_es_diagnostics = self._compute_es_diagnostics(op_metrics, full_op_id_to_record_op_stats, full_op_id_to_num_samples)
+        if self.es_enabled and not self.converged and policy_dict["quality"] != 0.0:
+            self._check_convergence(op_metrics, full_op_id_to_record_op_stats, full_op_id_to_num_samples, unique_logical_op_id)
+        if self.es_enabled and self.converged and self.num_physical_ops > 1 and self.leader_full_op_id is not None:
+            all_ops = new_frontier_ops + new_off_frontier_ops + self.reservoir_ops
+            leader_op = next((op for op in all_ops if op.get_full_op_id() == self.leader_full_op_id), None)
+            if leader_op is not None:
+                kept = []
+                for op in new_frontier_ops:
+                    if op is leader_op:
+                        continue
+                    if full_op_id_to_num_samples.get(op.get_full_op_id(), 0) == 0:
+                        self.reservoir_ops.insert(0, op)   # never sampled: return to reservoir
+                    else:
+                        kept.append(op)
+                new_off_frontier_ops = [op for op in new_off_frontier_ops if op is not leader_op] + kept
+                self.reservoir_ops = [op for op in self.reservoir_ops if op is not leader_op]
+                new_frontier_ops = [leader_op]
+
         # update the frontier and off frontier ops
         self.frontier_ops = new_frontier_ops
+        self.off_frontier_ops = new_off_frontier_ops
 
                         # ===== COMPREHENSIVE TRAJECTORY LOGGING =====
         try:
@@ -609,8 +837,20 @@ class OpFrontier:
                     "operator_class": op.__class__.__name__,
                     "logical_op_id": op.logical_op_id,
                 }
-                if hasattr(op, "model"):
-                    info["model"] = op.model.model_name
+                if getattr(op, "model", None) is not None:
+                    m = op.model
+                    info["model"] = str(getattr(m, "model_name", None) or getattr(m, "model_id", None) or getattr(m, "value", None) or m)
+                if getattr(op, "proposer_models", None) is not None:
+                    info["proposer_models"] = [str(getattr(m, "model_name", None) or getattr(m, "value", None) or m) for m in op.proposer_models]
+                if getattr(op, "aggregator_model", None) is not None:
+                    m = op.aggregator_model
+                    info["aggregator_model"] = str(getattr(m, "model_name", None) or getattr(m, "value", None) or m)
+                if getattr(op, "critic_model", None) is not None:
+                    m = op.critic_model
+                    info["critic_model"] = str(getattr(m, "model_name", None) or getattr(m, "value", None) or m)
+                if getattr(op, "refine_model", None) is not None:
+                    m = op.refine_model
+                    info["refine_model"] = str(getattr(m, "model_name", None) or getattr(m, "value", None) or m)
                 if hasattr(op, "prompt_strategy"):
                     info["prompt_strategy"] = str(op.prompt_strategy)
                 if hasattr(op, "k"):
@@ -632,7 +872,10 @@ class OpFrontier:
                 mean_time = metrics["mean"][1]
                 prune_reason = None
                 if status == "RETIRED_OR_PRUNED":
-                    if time_bound is not None and mean_time > time_bound:
+                    if full_op_id in self.quality_pruned_full_op_ids:
+                        status = "RETIRED"
+                        prune_reason = "LOW_RELATIVE_QUALITY"
+                    elif time_bound is not None and mean_time > time_bound:
                         status = "PRUNED"
                         prune_reason = "EXCEEDED_TIMEOUT"
                     else:
@@ -662,6 +905,9 @@ class OpFrontier:
             round_data = {
                 "logical_op_id": unique_logical_op_id,
                 "global_total_samples": int(total_num_samples),
+                "converged": bool(self.converged) if self.es_enabled else None,
+                "convergence_info": self.convergence_info if self.es_enabled else None,
+                "es_diagnostics": self.last_es_diagnostics,
                 "physical_operators": detailed_ops
             }
             with open(traj_file, "a") as f:
@@ -670,7 +916,6 @@ class OpFrontier:
         except Exception as e:
             print(f"Error logging COMPREHENSIVE trajectory: {e}")
         # ==================================
-        self.off_frontier_ops = new_off_frontier_ops
 
     def pick_highest_quality_output(self, record_sets: list[DataRecordSet]) -> DataRecordSet:
         # if there's only one operator in the set, we return its record_set
@@ -798,6 +1043,18 @@ class MABExecutionStrategy(SentinelExecutionStrategy):
         round_num = 1
         import datetime
         while not self._compute_termination_condition(samples_drawn, sampling_cost):
+            # early termination: stop as soon as every logical operator has converged
+            es_frontiers = [f for f in op_frontiers.values() if f.es_enabled]
+            if es_frontiers and all(f.converged for f in op_frontiers.values()):
+                print(f"\n[early-stop] all logical operators converged after {samples_drawn}/{self.sample_budget} samples; "
+                      f"stopping optimization.", flush=True)
+                logger.info(f"[early-stop] all frontiers converged at {samples_drawn}/{self.sample_budget} samples")
+                break
+            # share of the remaining budget available to each still-unconverged frontier (for the futility test)
+            open_frontiers = [f for f in op_frontiers.values() if not f.converged]
+            remaining = max(self.sample_budget - samples_drawn, 0) if self.sample_cost_budget is None else float("inf")
+            for f in open_frontiers:
+                f.es_remaining_budget = remaining / max(len(open_frontiers), 1)
             ts = datetime.datetime.now().strftime("[%H:%M:%S]")
             print(f"\n{ts} ==================== SENTINEL ROUND {round_num} (Total Samples Drawn: {samples_drawn}/{self.sample_budget}) ====================\n", flush=True)
             round_num += 1

@@ -99,8 +99,11 @@ class ConvertOp(PhysicalOperator, ABC):
         Construct list of RecordOpStats objects (one for each DataRecord).
         """
         # amortize the generation stats across all generated records
-        per_record_stats = generation_stats / len(records)
-        time_per_record = total_time / len(records)
+        if generation_stats is None:
+            generation_stats = GenerationStats(model_name=self.get_model_name())
+        n_recs = max(len(records), 1)
+        per_record_stats = generation_stats / n_recs
+        time_per_record = total_time / n_recs
 
         # create the RecordOpStats objects for each output record
         record_op_stats_lst = [

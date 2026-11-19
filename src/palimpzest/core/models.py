@@ -56,16 +56,20 @@ class GenerationStats(BaseModel):
     # (if applicable) the total number of embedding LLM calls made by this operator
     total_embedding_llm_calls: float = 0.0
 
-    def __iadd__(self, other: GenerationStats) -> GenerationStats:
+    def __iadd__(self, other: GenerationStats | None) -> GenerationStats:
+        if other is None or isinstance(other, (int, float)):
+            return self
         for field in type(self).model_fields:
             if field == "model_name":
                 continue
-            setattr(self, field, getattr(self, field) + getattr(other, field))
+            setattr(self, field, (getattr(self, field, 0.0) or 0.0) + (getattr(other, field, 0.0) or 0.0))
         return self
 
-    def __add__(self, other: GenerationStats) -> GenerationStats:
+    def __add__(self, other: GenerationStats | None) -> GenerationStats:
+        if other is None or isinstance(other, (int, float)):
+            return self
         dct = {
-            field: getattr(self, field) + getattr(other, field)
+            field: (getattr(self, field, 0.0) or 0.0) + (getattr(other, field, 0.0) or 0.0)
             for field in type(self).model_fields
             if field != "model_name"
         }

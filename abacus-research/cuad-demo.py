@@ -686,6 +686,13 @@ def parse_arguments():
         type=int,
         help="Number of contracts to evaluate",
     )
+    parser.add_argument(
+        "--val-examples",
+        default=20,
+        type=int,
+        help="Number of validation contracts in train_dataset/validator",
+    )
+    parser.add_argument("--progress", default=False, action="store_true", help="Show progress bar")
     
     parser.add_argument(
         "--model1-port",
@@ -736,14 +743,15 @@ def main():
     os.makedirs("opt-profiling-data", exist_ok=True)
 
     # create validator for CUAD
-    validator_size = min(25, args.num_contracts)
+    validator_size = min(args.val_examples, 25)
     validator = CUADValidator(num_contracts=validator_size, seed=args.seed)
 
     # create datasets for CUAD
-    dataset = CUADDataset(split="test", num_contracts=args.num_contracts, seed=args.seed)
+    num_test_contracts = int(os.getenv("CUAD_TEST_SAMPLES", str(args.num_contracts)))
+    dataset = CUADDataset(split="test", num_contracts=num_test_contracts, seed=args.seed)
     train_dataset = CUADDataset(split="train", num_contracts=validator_size, seed=args.seed)
     train_dataset = {train_dataset.id: train_dataset}
-    print("Created datasets")
+    print(f"Created datasets (val={validator_size}, test={num_test_contracts})")
 
     # build and run the CUAD query
     query = build_cuad_query(dataset, args.mode)
@@ -823,11 +831,11 @@ def main():
 
     config = pz.QueryProcessorConfig(
         policy=policy,
-        verbose=False,
+        verbose=args.verbose,
         optimizer_strategy=optimizer_strategy,
         sentinel_execution_strategy=sentinel_strategy,
         execution_strategy=execution_strategy,
-        max_workers=16,
+        max_workers=int(os.getenv("CUAD_MAX_WORKERS", "8")),
         available_models=models,
         allow_bonded_query=True,
         allow_critic=True,
@@ -840,20 +848,27 @@ def main():
         seed=seed,
         exp_name=exp_name,
         priors=priors,
-        dont_use_priors=(priors is None),
+        dont_use_priors=bool(os.getenv("CUAD_DONT_USE_PRIORS", "")) if priors is None else False,
     )
 
     print(f"EXPERIMENT NAME: {exp_name}")
     data_record_collection = query.optimize_and_run(config=config, train_dataset=train_dataset, validator=validator)
     print("Query execution completed")
 
-    # save statistics
+    # save statistics (both -stats.json and -profiling.json for compatibility with analysis scripts)
     execution_stats_dict = data_record_collection.execution_stats.to_json()
     with open(f"opt-profiling-data/{exp_name}-stats.json", "w") as f:
         json.dump(execution_stats_dict, f)
+    with open(f"opt-profiling-data/{exp_name}-profiling.json", "w") as f:
+        json.dump(execution_stats_dict, f)
 
     pred_df = data_record_collection.to_df()
-    label_df = get_label_df(num_contracts=args.num_contracts, seed=seed)
+    pred_df.to_csv(f"opt-profiling-data/{exp_name}-output.csv", index=False)
+    record_jsons = [record.to_dict() for record in data_record_collection]
+    with open(f"opt-profiling-data/{exp_name}-records.json", "w") as f:
+        json.dump(record_jsons, f, default=str)
+
+    label_df = get_label_df(num_contracts=num_test_contracts, seed=seed)
     # pred_df.to_csv(f"{exp_name}-pred.csv", index=False)
     # label_df.to_csv(f"{exp_name}-label.csv", index=False)
     final_plan_id = list(data_record_collection.execution_stats.plan_stats.keys())[0]

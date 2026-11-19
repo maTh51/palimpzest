@@ -450,7 +450,7 @@ if __name__ == "__main__":
         return {"reaction_labels": final_sorted_results[:k]}
 
     # construct plan
-    plan = BiodexDataset(split="test", num_samples=250, shuffle=True, seed=seed)
+    plan = BiodexDataset(split="test", num_samples=int(os.getenv("BIODEX_TEST_SAMPLES", "250")), shuffle=True, seed=seed)
     plan = plan.sem_map(biodex_reactions_cols)
     plan = plan.sem_topk(
         index=index,
@@ -473,7 +473,7 @@ if __name__ == "__main__":
         sentinel_execution_strategy=sentinel_execution_strategy,
         execution_strategy=execution_strategy,
         use_final_op_quality=True,
-        max_workers=16,
+        max_workers=int(os.getenv("BIODEX_MAX_WORKERS", "16")),
         verbose=verbose,
         available_models=models,
         allow_bonded_query=True,

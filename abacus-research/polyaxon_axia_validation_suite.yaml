@@ -1,0 +1,46 @@
+version: 1.1
+kind: operation
+tags: [abacus, axia, early-stop, validation-suite, h200]
+queue: axia/default
+name: abacus-es-axia-validation-suite
+component:
+  kind: component
+  run:
+    kind: job
+    connections: [local-scratch]
+    container:
+      securityContext:
+        capabilities:
+          add: ["SYS_RESOURCE"]
+      image: "gabrieljamarante/teste_pali:latest"
+      workingDir: "{{ globals.artifacts_path }}/{{ globals.uuid }}/uploads"
+      command: ["/bin/bash", "-c"]
+      args:
+        - |
+          echo "=========================================================="
+          echo " Starting Axia Early-Stop Validation Suite (H200)"
+          echo " Job ID: {{ globals.uuid }}"
+          echo "=========================================================="
+          nvidia-smi
+
+          [ -f "/opt/conda/etc/profile.d/conda.sh" ] && source /opt/conda/etc/profile.d/conda.sh && conda activate kunumi || true
+          export PATH="/usr/local/bin:/usr/bin:$PATH"
+
+          export POLYAXON_RUN_UUID="{{ globals.uuid }}"
+          export POLYAXON_OUTPUT_DIR="{{ globals.artifacts_path }}/{{ globals.uuid }}/outputs"
+          mkdir -p "$POLYAXON_OUTPUT_DIR/opt-profiling-data"
+
+          UPLOAD_DIR="{{ globals.artifacts_path }}/{{ globals.uuid }}/uploads"
+          cd "$UPLOAD_DIR"
+
+          chmod +x morfeu/*.sh *.sh 2>/dev/null || true
+          /bin/bash ./morfeu/run_axia_validation_suite.sh
+
+          cp -r opt-profiling-data "$POLYAXON_OUTPUT_DIR/" 2>/dev/null || true
+          cp -r var/logs "$POLYAXON_OUTPUT_DIR/" 2>/dev/null || true
+          tar -czf "$POLYAXON_OUTPUT_DIR/resultados-axia-validation.tar.gz" opt-profiling-data var/logs 2>/dev/null || true
+      resources:
+        requests:
+          nvidia.com/gpu: 2
+        limits:
+          nvidia.com/gpu: 2

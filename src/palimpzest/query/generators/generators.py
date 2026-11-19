@@ -382,7 +382,9 @@ class Generator(Generic[ContextType, InputType]):
                 completion = litellm.completion(model=model_name, messages=messages, **completion_kwargs)
                 end_time = time.time()
                 completion_text = completion.choices[0].message.content
-                usage = completion.usage.model_dump()
+                if completion_text is None:
+                    completion_text = getattr(completion.choices[0].message, "reasoning_content", None) or ""
+                usage = completion.usage.model_dump() if getattr(completion, "usage", None) is not None else {}
                 logger.debug(f"Generated completion via litellm in {end_time - start_time:.2f} seconds")
 
         # if there's an error generating the completion, we have to return an empty answer
@@ -404,7 +406,11 @@ class Generator(Generic[ContextType, InputType]):
             return field_answers, reasoning, generation_stats, messages
 
         # parse usage statistics and create the GenerationStats
-        generation_stats = None
+        generation_stats = GenerationStats(
+            model_name=self.model_name,
+            llm_call_duration_secs=end_time - start_time,
+            total_llm_calls=1,
+        )
         if completion_text is not None:
             # get cost per input/output token for the model
             usd_per_input_token = self.model.get_usd_per_input_token() or 0.0

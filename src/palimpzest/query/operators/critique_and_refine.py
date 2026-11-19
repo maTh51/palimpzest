@@ -98,7 +98,7 @@ class CritiqueAndRefineConvert(LLMConvert):
         field_answers, reasoning, refine_gen_stats, _ = self.refine_generator(candidate, fields, **refine_gen_kwargs)
 
         # compute the total generation stats
-        generation_stats = original_gen_stats + critic_gen_stats + refine_gen_stats
+        generation_stats = (original_gen_stats or GenerationStats()) + (critic_gen_stats or GenerationStats()) + (refine_gen_stats or GenerationStats())
 
         return field_answers, generation_stats
 
@@ -189,6 +189,6 @@ class CritiqueAndRefineFilter(LLMFilter):
         field_answers, reasoning, refine_gen_stats, _ = self.refine_generator(candidate, fields, **refine_gen_kwargs)
 
         # compute the total generation stats
-        generation_stats = original_gen_stats + critic_gen_stats + refine_gen_stats
+        generation_stats = (original_gen_stats or GenerationStats()) + (critic_gen_stats or GenerationStats()) + (refine_gen_stats or GenerationStats())
 
         return field_answers, generation_stats
